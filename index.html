@@ -31,10 +31,8 @@
         .tiktok-container { height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .tiktok-item { height: 100dvh; scroll-snap-align: start; position: relative; }
         
-        /* تدرج خلفيات الأقسام مع الحفاظ على الأبعاد */
         .category-bg-blend { position: absolute; inset: 0; z-index: 0; opacity: 0.4; mask-image: linear-gradient(to bottom, black 30%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%); object-fit: cover; object-position: center; width: 100%; height: 100%; }
         
-        /* كروت الأقسام الشفافة */
         .category-silhouette { filter: brightness(0.4) contrast(1.2) grayscale(0.5); transition: all 0.3s ease; object-fit: cover; object-position: center; }
         .cat-box:hover .category-silhouette { filter: brightness(0.8) contrast(1.2) grayscale(0); transform: scale(1.1); }
     </style>
@@ -146,7 +144,7 @@
                                 <div class="flex justify-between items-start border-b border-white/10 pb-4 last:border-0">
                                     <div class="flex-1 pr-4">
                                         <h4 class="font-bold text-white text-base mb-1 drop-shadow" x-text="item.name"></h4>
-                                        <p class="text-[11px] text-gray-300 leading-relaxed mb-2" x-text="item.description"></p>
+                                        <p class="text-xs text-gray-400 leading-relaxed mb-2 w-full" x-text="item.description"></p>
                                         <span class="text-[#D4AF37] font-black text-sm" x-text="item.price + ' SR'"></span>
                                     </div>
                                     <button @click="toggleLike(item)" class="p-3 bg-black/60 rounded-full border border-white/10 active:scale-90 transition backdrop-blur flex-shrink-0">
@@ -164,28 +162,59 @@
     <div x-show="view === 'explore'" x-cloak class="tiktok-container relative bg-black">
         <template x-for="item in activeExploreItems" :key="item.id">
             <div class="tiktok-item" :id="'explore-' + item.id">
-                <template x-if="isVideo(item.image)">
-                    <video :src="item.image" autoplay loop muted playsinline class="w-full h-full object-cover object-center"></video>
-                </template>
-                <template x-if="!isVideo(item.image)">
-                    <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
-                </template>
                 
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32">
-                    <span class="bg-red-600/80 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2 uppercase" x-text="t('nav_explore')"></span>
-                    <h2 class="text-3xl font-black mb-2 text-white drop-shadow-xl" x-text="item.name"></h2>
-                    <p class="text-gray-200 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3" x-text="item.description"></p>
-                    <span class="text-2xl font-black text-[#D4AF37] drop-shadow-lg" x-text="item.price + ' SR'"></span>
-                    
-                    <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center">
-                        <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
-                            <span class="text-3xl" x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
-                        </button>
-                        <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
-                            <span class="text-2xl">🔗</span>
-                        </button>
+                <template x-if="item.isSocial">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] z-50">
+                        <img :src="item.image" class="h-28 mb-8 drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]">
+                        <h2 class="text-3xl font-black text-[#D4AF37] mb-4 text-center" x-text="item.name"></h2>
+                        <p class="text-gray-300 text-center mb-10 text-sm leading-relaxed" x-text="item.description"></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
+                            <a href="https://www.tiktok.com/@taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition">
+                                <span class="text-2xl">🎵</span><span class="text-xs font-bold">TikTok</span>
+                            </a>
+                            <a href="https://www.instagram.com/taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition">
+                                <span class="text-2xl">📸</span><span class="text-xs font-bold">Instagram</span>
+                            </a>
+                            <a href="https://www.youtube.com/channel/UCa6QUKNGNa4FKSOxhSeyxiQ" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition">
+                                <span class="text-2xl">▶️</span><span class="text-xs font-bold">YouTube</span>
+                            </a>
+                            <a href="https://taksimpoint.sa/locations/" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition">
+                                <span class="text-2xl">📍</span><span class="text-xs font-bold">Locations</span>
+                            </a>
+                        </div>
                     </div>
-                </div>
+                </template>
+
+                <template x-if="!item.isSocial">
+                    <div class="w-full h-full relative">
+                        <template x-if="item.isVideo || isVideo(item.image)">
+                            <video :src="item.image" autoplay loop muted playsinline class="w-full h-full object-cover object-center"></video>
+                        </template>
+                        <template x-if="!item.isVideo && !isVideo(item.image)">
+                            <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
+                        </template>
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32">
+                            <span class="bg-red-600/80 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2 uppercase" x-text="t('nav_explore')"></span>
+                            <h2 class="text-3xl font-black mb-2 text-white drop-shadow-xl" x-text="item.name"></h2>
+                            <p class="text-gray-200 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3" x-text="item.description"></p>
+                            <template x-if="item.price"><span class="text-2xl font-black text-[#D4AF37] drop-shadow-lg" x-text="item.price + ' SR'"></span></template>
+                            
+                            <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center">
+                                <template x-if="!item.custom">
+                                    <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
+                                        <span class="text-3xl" x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
+                                    </button>
+                                </template>
+                                <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
+                                    <span class="text-2xl">🔗</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
             </div>
         </template>
     </div>
@@ -244,10 +273,12 @@
                 activeMenuItems: [],
                 activeExploreItems: [],
                 heroOffers: [],
-                categoryBgs: {}, 
+                
+                globalImages: {}, // قاموس يخزن كل الصور من الشيت العربي
+                categoryBgs: {},  // قاموس خلفيات الأقسام
                 
                 likes: JSON.parse(localStorage.getItem('taksim_likes') || '[]'),
-                targetHeroIds: ['TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-171', 'TP-172', 'TP-173', 'TP-174', 'TP-175'],
+                targetHeroIds: ['TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-174', 'TP-175'],
 
                 uiDict: {
                     ar: {
@@ -260,8 +291,8 @@
                     },
                     en: {
                         about_title: "From Taksim Point,,,,",
-                        about_p1: "Taksim Point Restaurant is one of the finest restaurants offering the highest quality of Turkish and international cuisine and grills, suitable for everyone. It is also distinguished by its affordable prices alongside great quality and delicious taste. Taksim Point is famous for its 100% fresh meats, which receive special care from our farms.",
-                        about_p2: "From this standpoint, our primary mission is to provide the best service and quality to all customers without exception. We have an outstanding team across all restaurant departments. Taksim Point aspires to become one of the most prominent restaurants globally.",
+                        about_p1: "Taksim Point Restaurant is one of the finest restaurants offering the highest quality of Turkish and international cuisine and grills. It is also distinguished by its affordable prices alongside great quality. Taksim Point is famous for its 100% fresh meats.",
+                        about_p2: "From this standpoint, our primary mission is to provide the best service and quality to all customers. We have an outstanding team across all restaurant departments. Taksim Point aspires to become one of the most prominent restaurants globally.",
                         nav_home: "Home", nav_menu: "Menu", nav_explore: "Explore", nav_likes: "My Order",
                         branch_alshati: "Waterfront", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara",
                         copy_order: "📋 Copy Order", empty_likes: "No items selected."
@@ -300,29 +331,46 @@
                 get isRTL() { return ['ar', 'ur', 'fa', 'he'].includes(this.currentLang); },
                 t(key) { const dict = this.uiDict[this.currentLang] || this.uiDict['en']; return dict[key] || this.uiDict['ar'][key] || key; },
 
-                async changeLanguage() {
-                    this.isLoading = true;
+                // دالة لسحب وتخزين كل الصور من الشيت العربي الرئيسي لضمان توفرها بجميع اللغات
+                async fetchGlobalImages() {
                     try {
-                        const res = await fetch(this.langLinks[this.currentLang]);
+                        const res = await fetch(this.langLinks['ar'] + '&t=' + Date.now());
+                        const text = await res.text();
+                        Papa.parse(text, {
+                            header: false, skipEmptyLines: true,
+                            complete: (results) => {
+                                results.data.slice(1).forEach(cols => {
+                                    let id = (cols[0] || '').trim();
+                                    let img = (cols[6] || '').trim();
+                                    if(id && img) this.globalImages[id] = img;
+                                });
+                            }
+                        });
+                    } catch(e) {}
+                },
+
+                async changeLanguage(isBackgroundSync = false) {
+                    if(!isBackgroundSync) this.isLoading = true;
+                    try {
+                        // إضافة ?t=timestamp لمنع المتصفح من الكاش وجلب التحديثات فوراً
+                        const res = await fetch(this.langLinks[this.currentLang] + '&t=' + Date.now());
                         const text = await res.text();
                         
-                        // هنا يتم الحل السحري عبر مكتبة PapaParse (لا تعتمد على الفواصل السطرية الداخلية)
                         Papa.parse(text, {
-                            header: false,
-                            skipEmptyLines: true,
+                            header: false, skipEmptyLines: true,
                             complete: (results) => {
                                 const rows = results.data.slice(1);
                                 
                                 let parsedData = rows.map(cols => {
+                                    let id = (cols[0] || '').trim();
                                     return {
-                                        id: (cols[0] || '').trim(),
+                                        id: id,
                                         category: (cols[1] || '').trim(),
                                         name: (cols[2] || '').trim(),
                                         price: (cols[3] || '').trim(),
-                                        calories: (cols[4] || '').trim(),
-                                        // دمج الفواصل السطرية داخل الوصف لتبدو مرتبة في سطر واحد
                                         description: (cols[5] || '').replace(/\r?\n|\r/g, ' ').trim(),
-                                        image: (cols[6] || '').trim(),
+                                        // إذا لم يجد صورة في الشيت المترجم، سيسحبها من الذاكرة المخبأة للشيت العربي
+                                        image: (cols[6] || '').trim() || this.globalImages[id] || '',
                                         almanar: (cols[7] || '').trim(),
                                         aljawhara: (cols[8] || '').trim(),
                                         alshati: (cols[9] || '').trim()
@@ -331,6 +379,7 @@
 
                                 this.allRawData = parsedData;
 
+                                // إنشاء قاموس خلفيات الأقسام بدقة
                                 this.categoryBgs = {};
                                 parsedData.forEach(item => {
                                     const numId = parseInt(item.id.replace('TP-', ''));
@@ -353,20 +402,51 @@
                         return true;
                     });
 
-                    this.activeExploreItems = availableItems.filter(i => i.category === 'الاستكشاف' || i.category === 'Explore' || i.category === 'Keşfet');
-
+                    // 1. العناصر العادية للمنيو 
                     this.activeMenuItems = availableItems.filter(item => {
                         const numId = parseInt(item.id.replace('TP-', ''));
-                        return (numId < 280 || numId > 302) && item.category !== 'الاستكشاف' && item.category !== 'Explore' && item.category !== 'Keşfet';
+                        return (numId < 280 || numId > 302) && !['الاستكشاف', 'Explore', 'Keşfet'].includes(item.category);
                     });
 
                     this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
+
+                    // 2. عناصر الاستكشاف وإضافة الفيديو المخصص وبطاقة السوشيال ميديا
+                    let dbExploreItems = availableItems.filter(i => ['الاستكشاف', 'Explore', 'Keşfet'].includes(i.category));
+                    
+                    const customVideo = {
+                        id: 'custom-vid-1',
+                        name: 'أجواء تقسيم بوينت',
+                        description: 'شاهد الفخامة والمذاق الأصيل في أروقة مطاعمنا.',
+                        price: '',
+                        image: 'https://drive.google.com/uc?export=download&id=1AbI4yPT8MqLWciJrts2SY66UYkwmmRQm',
+                        category: 'استكشاف',
+                        isVideo: true,
+                        custom: true
+                    };
+                    
+                    const socialCard = {
+                        id: 'social-card-1',
+                        name: 'تابعونا على المنصات',
+                        description: 'كن على إطلاع دائم بآخر العروض والأطباق الجديدة من تقسيم بوينت.',
+                        image: 'https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png',
+                        isSocial: true,
+                        custom: true
+                    };
+
+                    this.activeExploreItems = [customVideo, ...dbExploreItems, socialCard];
 
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?branch=' + this.currentBranch;
                     window.history.replaceState({path:newUrl}, '', newUrl);
 
                     this.checkDeepLink();
                     this.isLoading = false;
+                },
+
+                // التحديث التلقائي الصامت كل 60 ثانية (Live Sync)
+                startBackgroundSync() {
+                    setInterval(() => {
+                        this.changeLanguage(true); // true تعني تحديث صامت بدون شاشة تحميل
+                    }, 60000);
                 },
 
                 get normalCategories() {
@@ -377,13 +457,8 @@
                     return this.categoryBgs[catName] || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800';
                 },
 
-                getBranchUrl() {
-                    return window.location.origin + window.location.pathname + '?branch=' + this.currentBranch;
-                },
-
-                copyBranchUrl() {
-                    navigator.clipboard.writeText(this.getBranchUrl()).then(() => alert('تم نسخ رابط الفرع!'));
-                },
+                getBranchUrl() { return window.location.origin + window.location.pathname + '?branch=' + this.currentBranch; },
+                copyBranchUrl() { navigator.clipboard.writeText(this.getBranchUrl()).then(() => alert('تم نسخ رابط الفرع!')); },
 
                 checkDeepLink() {
                     const urlParams = new URLSearchParams(window.location.search);
@@ -400,7 +475,7 @@
                     }
                 },
 
-                isVideo(url) { return url && (url.match(/\.(mp4|webm|ogg)$/i) || url.includes('video')); },
+                isVideo(url) { return url && (url.match(/\.(mp4|webm|ogg)$/i) || url.includes('video') || url.includes('drive.google')); },
 
                 openMenu(cat) {
                     this.view = 'menu';
@@ -436,10 +511,16 @@
                     navigator.clipboard.writeText(text).then(() => alert('تم النسخ بنجاح!'));
                 },
 
-                initApp() { 
+                async initApp() { 
                     const urlParams = new URLSearchParams(window.location.search);
                     if(urlParams.get('branch')) this.currentBranch = urlParams.get('branch');
-                    this.changeLanguage(); 
+                    
+                    // سحب الصور من العربي لضمان توفرها للغات الأخرى أولاً
+                    await this.fetchGlobalImages();
+                    await this.changeLanguage(); 
+                    
+                    // تشغيل المزامنة التلقائية
+                    this.startBackgroundSync();
                 }
             }
         }
