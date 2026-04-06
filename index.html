@@ -31,8 +31,12 @@
         .tiktok-container { height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .tiktok-item { height: 100dvh; scroll-snap-align: start; position: relative; }
         
-        /* تدرج خلفيات الأقسام */
-        .category-bg-blend { position: absolute; inset: 0; z-index: 0; opacity: 0.4; mask-image: linear-gradient(to bottom, black 30%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%); object-fit: cover; width: 100%; height: 100%; }
+        /* تدرج خلفيات الأقسام مع الحفاظ على الأبعاد */
+        .category-bg-blend { position: absolute; inset: 0; z-index: 0; opacity: 0.4; mask-image: linear-gradient(to bottom, black 30%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%); object-fit: cover; object-position: center; width: 100%; height: 100%; }
+        
+        /* كروت الأقسام الشفافة */
+        .category-silhouette { filter: brightness(0.4) contrast(1.2) grayscale(0.5); transition: all 0.3s ease; object-fit: cover; object-position: center; }
+        .cat-box:hover .category-silhouette { filter: brightness(0.8) contrast(1.2) grayscale(0); transform: scale(1.1); }
     </style>
 </head>
 <body class="overflow-x-hidden relative" :dir="isRTL ? 'rtl' : 'ltr'" x-init="initApp()">
@@ -91,7 +95,7 @@
             <div class="slider-container h-full no-scrollbar rounded-xl border border-[#D4AF37]/20 shadow-[0_0_20px_rgba(0,0,0,0.8)]" id="hero-slider">
                 <template x-for="item in heroOffers" :key="item.id">
                     <div class="slide relative h-full">
-                        <img :src="item.image" class="w-full h-full object-cover opacity-80">
+                        <img :src="item.image" class="w-full h-full object-cover object-center opacity-80">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-5">
                             <h2 class="text-2xl font-black text-white mb-1 drop-shadow-lg" x-text="item.name"></h2>
                             <p class="text-gray-300 text-xs line-clamp-2 mb-3" x-text="item.description"></p>
@@ -109,10 +113,10 @@
             <h3 class="text-lg font-black mb-6 gold-gradient text-center uppercase tracking-widest" x-text="t('nav_menu')"></h3>
             <div class="grid grid-cols-2 gap-3">
                 <template x-for="cat in normalCategories" :key="cat">
-                    <button @click="openMenu(cat)" class="relative h-28 rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#111] group">
-                        <img :src="getCategoryBg(cat)" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-70 transition duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-                        <span class="absolute bottom-3 w-full text-center text-[#D4AF37] font-black text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,1)] px-1" x-text="cat"></span>
+                    <button @click="openMenu(cat)" class="cat-box relative h-28 rounded-xl overflow-hidden border border-white/10 bg-[#111] flex items-center justify-center group">
+                        <img :src="getCategoryBg(cat)" class="absolute inset-0 w-full h-full category-silhouette">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20"></div>
+                        <span class="relative z-10 text-[#D4AF37] font-black text-sm text-center px-1 drop-shadow-[0_2px_2px_rgba(0,0,0,1)]" x-text="cat"></span>
                     </button>
                 </template>
             </div>
@@ -142,7 +146,7 @@
                                 <div class="flex justify-between items-start border-b border-white/10 pb-4 last:border-0">
                                     <div class="flex-1 pr-4">
                                         <h4 class="font-bold text-white text-base mb-1 drop-shadow" x-text="item.name"></h4>
-                                        <p class="text-xs text-gray-400 leading-relaxed mb-2 w-full" x-text="item.description"></p>
+                                        <p class="text-[11px] text-gray-300 leading-relaxed mb-2" x-text="item.description"></p>
                                         <span class="text-[#D4AF37] font-black text-sm" x-text="item.price + ' SR'"></span>
                                     </div>
                                     <button @click="toggleLike(item)" class="p-3 bg-black/60 rounded-full border border-white/10 active:scale-90 transition backdrop-blur flex-shrink-0">
@@ -161,10 +165,10 @@
         <template x-for="item in activeExploreItems" :key="item.id">
             <div class="tiktok-item" :id="'explore-' + item.id">
                 <template x-if="isVideo(item.image)">
-                    <video :src="item.image" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                    <video :src="item.image" autoplay loop muted playsinline class="w-full h-full object-cover object-center"></video>
                 </template>
                 <template x-if="!isVideo(item.image)">
-                    <img :src="item.image" loading="lazy" class="w-full h-full object-cover opacity-90">
+                    <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
                 </template>
                 
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32">
@@ -174,10 +178,10 @@
                     <span class="text-2xl font-black text-[#D4AF37] drop-shadow-lg" x-text="item.price + ' SR'"></span>
                     
                     <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center">
-                        <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur xl p-4 rounded-full border border-white/20 active:scale-75 transition">
+                        <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
                             <span class="text-3xl" x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
                         </button>
-                        <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur xl p-4 rounded-full border border-white/20 active:scale-75 transition">
+                        <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
                             <span class="text-2xl">🔗</span>
                         </button>
                     </div>
@@ -243,7 +247,7 @@
                 categoryBgs: {}, 
                 
                 likes: JSON.parse(localStorage.getItem('taksim_likes') || '[]'),
-                targetHeroIds: ['TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-174', 'TP-175'],
+                targetHeroIds: ['TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-171', 'TP-172', 'TP-173', 'TP-174', 'TP-175'],
 
                 uiDict: {
                     ar: {
@@ -257,7 +261,7 @@
                     en: {
                         about_title: "From Taksim Point,,,,",
                         about_p1: "Taksim Point Restaurant is one of the finest restaurants offering the highest quality of Turkish and international cuisine and grills, suitable for everyone. It is also distinguished by its affordable prices alongside great quality and delicious taste. Taksim Point is famous for its 100% fresh meats, which receive special care from our farms.",
-                        about_p2: "From this standpoint, our primary mission is to provide the best service and quality to all customers without exception. We have an outstanding team across all restaurant departments (Kitchen, Reception, Hospitality, and Hygiene). Taksim Point aspires to become one of the most prominent restaurants in the Kingdom of Saudi Arabia and the world.",
+                        about_p2: "From this standpoint, our primary mission is to provide the best service and quality to all customers without exception. We have an outstanding team across all restaurant departments. Taksim Point aspires to become one of the most prominent restaurants globally.",
                         nav_home: "Home", nav_menu: "Menu", nav_explore: "Explore", nav_likes: "My Order",
                         branch_alshati: "Waterfront", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara",
                         copy_order: "📋 Copy Order", empty_likes: "No items selected."
@@ -265,7 +269,7 @@
                     tr: {
                         about_title: "Taksim Point'ten,,,,",
                         about_p1: "Taksim Point, herkes için uygun olan en kaliteli Türk ve uluslararası yemekleri ve ızgaraları sunan en iyi restoranlardan biridir. Harika lezzetinin yanında uygun fiyatlarıyla da öne çıkar. Çiftliklerimizden özel bakım gören %100 taze etleriyle ünlüdür.",
-                        about_p2: "Bu vizyonla en önemli görevimiz tüm müşterilerimize en iyi hizmeti sunmaktır. (Mutfak, Resepsiyon, Ağırlama ve Temizlik) tüm bölümlerde seçkin bir ekibe sahibiz. Taksim Point, Suudi Arabistan ve dünyadaki en önemli restoranlardan biri olmayı hedeflemektedir.",
+                        about_p2: "Bu vizyonla en önemli görevimiz tüm müşterilerimize en iyi hizmeti sunmaktır. Taksim Point, dünyadaki en önemli restoranlardan biri olmayı hedeflemektedir.",
                         nav_home: "Ana Sayfa", nav_menu: "Menü", nav_explore: "Keşfet", nav_likes: "Siparişlerim",
                         branch_alshati: "Sahil", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara",
                         copy_order: "📋 Siparişi Kopyala", empty_likes: "Sipariş bulunamadı."
@@ -273,6 +277,7 @@
                 },
 
                 langNames: { ar: 'العربية', en: 'English', tr: 'Türkçe', es: 'Español', ru: 'Русский', ur: 'اردو', hi: 'हिन्दी', fr: 'Français', du: 'Deutsch', zn: '中文', ja: '日本語', ko: '한국어', it: 'Italiano', vi: 'Tiếng Việt', th: 'ไทย', id: 'Indonesia' },
+                
                 langLinks: {
                     ar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2026156602&single=true&output=csv',
                     en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv',
@@ -301,12 +306,12 @@
                         const res = await fetch(this.langLinks[this.currentLang]);
                         const text = await res.text();
                         
-                        // استخدام PapaParse للقراءة الدقيقة الخالية من الأخطاء
+                        // هنا يتم الحل السحري عبر مكتبة PapaParse (لا تعتمد على الفواصل السطرية الداخلية)
                         Papa.parse(text, {
                             header: false,
                             skipEmptyLines: true,
                             complete: (results) => {
-                                const rows = results.data.slice(1); // تجاهل الهيدر
+                                const rows = results.data.slice(1);
                                 
                                 let parsedData = rows.map(cols => {
                                     return {
@@ -315,7 +320,8 @@
                                         name: (cols[2] || '').trim(),
                                         price: (cols[3] || '').trim(),
                                         calories: (cols[4] || '').trim(),
-                                        description: (cols[5] || '').trim(),
+                                        // دمج الفواصل السطرية داخل الوصف لتبدو مرتبة في سطر واحد
+                                        description: (cols[5] || '').replace(/\r?\n|\r/g, ' ').trim(),
                                         image: (cols[6] || '').trim(),
                                         almanar: (cols[7] || '').trim(),
                                         aljawhara: (cols[8] || '').trim(),
@@ -325,7 +331,6 @@
 
                                 this.allRawData = parsedData;
 
-                                // 1. فرز خلفيات الأقسام (من TP-280 إلى TP-302)
                                 this.categoryBgs = {};
                                 parsedData.forEach(item => {
                                     const numId = parseInt(item.id.replace('TP-', ''));
