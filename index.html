@@ -1,178 +1,73 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" x-data="taksimPro()" :class="activeTheme">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taksim Point | Premium Menu</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <style>
-        :root { --gold: #D4AF37; --dark: #080808; --card: #121212; }
-        [x-cloak] { display: none !important; }
-        body { font-family: 'Tajawal', sans-serif; background-color: var(--dark); color: white; scroll-behavior: smooth; }
+<script>
+function taksimMaster() {
+    return {
+        view: 'home',
+        showFilter: false,
+        currentLang: 'ar',
+        activeTheme: 'theme-classic-dark',
+        menuItems: [],
+        featuredItems: [],
+        lunchItems: [],
+        sweetItems: [],
+        categoriesList: [],
+        heroIndex: 0,
         
-        /* تأثير الزجاج الفاخر */
-        .glass { background: rgba(18, 18, 18, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
-        .product-card { background: linear-gradient(145deg, #161616, #0e0e0e); border: 1px solid rgba(255,255,255,0.03); border-radius: 28px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .product-card:hover { border-color: var(--gold); transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        
-        /* تنسيق الـ Skeleton Loader لمنع الـ Lag */
-        .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        // خريطة أسماء اللغات للعرض الاحترافي
+        langNames: {
+            ar: 'العربية', en: 'English', tr: 'Türkçe', es: 'Español', 
+            ru: 'Русский', ur: 'اردو', hi: 'हिन्दी', fr: 'Français', 
+            du: 'Deutsch', zn: '中文', ja: '日本語', ko: '한국어', 
+            it: 'Italiano', vi: 'Tiếng Việt', th: 'ไทย', id: 'Bahasa Indonesia'
+        },
 
-        /* سكرول بار مخفي للتبويبات */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .active-tab { background-color: var(--gold); color: black !important; font-weight: bold; transform: scale(1.05); }
-    </style>
-</head>
-<body class="selection:bg-yellow-500/30">
+        // روابط الـ 16 لغة التي قدمتها أنت
+        langLinks: {
+            ar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2026156602&single=true&output=csv',
+            en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv',
+            tr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=932024028&single=true&output=csv',
+            es: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2126154876&single=true&output=csv',
+            ru: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1383179966&single=true&output=csv',
+            ur: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1356221249&single=true&output=csv',
+            hi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1947060246&single=true&output=csv',
+            fr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1967929524&single=true&output=csv',
+            du: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=330421505&single=true&output=csv',
+            zn: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=597359201&single=true&output=csv',
+            ja: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1140262731&single=true&output=csv',
+            ko: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=961009172&single=true&output=csv',
+            it: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1885756520&single=true&output=csv',
+            vi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=37768217&single=true&output=csv',
+            th: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=369450170&single=true&output=csv',
+            id: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1467238039&single=true&output=csv'
+        },
 
-    <header class="glass sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex flex-col">
-                    <span class="text-[var(--gold)] text-xs font-bold tracking-widest uppercase">Welcome To</span>
-                    <h1 class="text-2xl font-black italic tracking-tighter">TAKSIM <span class="text-[var(--gold)]">POINT</span></h1>
-                </div>
+        async loadMenu() {
+            try {
+                const res = await fetch(this.langLinks[this.currentLang]);
+                const text = await res.text();
+                const rows = text.split('\n').slice(1);
                 
-                <div class="flex gap-2">
-                    <select x-model="currentLang" @change="loadMenu()" class="bg-black/50 border border-yellow-600/30 rounded-full px-3 py-1 text-xs outline-none">
-                        <option value="ar">العربية</option>
-                        <option value="en">English</option>
-                        <option value="tr">Türkçe</option>
-                    </select>
-                </div>
-            </div>
+                this.menuItems = rows.map(row => {
+                    const cols = row.split(',');
+                    return {
+                        id: cols[0]?.trim(),
+                        category: cols[1]?.trim(),
+                        name: cols[2]?.trim(),
+                        price: cols[3]?.trim(),
+                        calories: cols[4]?.trim(),
+                        description: cols[5]?.trim(),
+                        image: cols[6]?.trim() || 'https://via.placeholder.com/400x300/111/D4AF37?text=Taksim+Point'
+                    }
+                }).filter(i => i.id);
 
-            <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2 mask-linear">
-                <template x-for="cat in categories" :key="cat">
-                    <button @click="activeCategory = cat" 
-                            :class="activeCategory === cat ? 'active-tab' : 'bg-white/5 text-gray-400'"
-                            class="px-6 py-2 rounded-full whitespace-nowrap transition-all duration-300 text-sm border border-white/5"
-                            x-text="cat"></button>
-                </template>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        
-        <div x-show="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <template x-for="i in 8">
-                <div class="h-80 rounded-[28px] skeleton opacity-20"></div>
-            </template>
-        </div>
-
-        <div x-show="!loading" x-cloak 
-             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-             x-transition:enter="transition ease-out duration-500"
-             x-transition:enter-start="opacity-0 translate-y-10"
-             x-transition:enter-end="opacity-100 translate-y-0">
-            
-            <template x-for="item in filteredItems" :key="item.id">
-                <div class="product-card group relative">
-                    <div class="relative h-56 overflow-hidden rounded-t-[28px]">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
-                        <img :src="item.image || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=500'" 
-                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                        <div class="absolute top-4 right-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                            <span class="text-[var(--gold)] font-bold text-sm" x-text="item.price + ' SR'"></span>
-                        </div>
-                    </div>
-
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2 group-hover:text-[var(--gold)] transition-colors" x-text="item.name"></h3>
-                        <p class="text-gray-400 text-sm leading-relaxed line-clamp-2 mb-4 h-10" x-text="item.description"></p>
-                        
-                        <div class="flex justify-between items-center mt-6">
-                            <div class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
-                                <span class="text-[10px] uppercase tracking-widest text-gray-500" x-text="item.calories + ' Calories'"></span>
-                            </div>
-                            
-                            <button @click="toggleLike(item.id)" class="hover:scale-125 transition-transform">
-                                <svg :class="isLiked(item.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </div>
-    </main>
-
-    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-        <div class="bg-black/80 backdrop-blur-2xl border border-white/10 px-8 py-4 rounded-full shadow-2xl flex gap-10 items-center">
-            <button class="text-[var(--gold)]"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-            <button class="text-gray-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
-            <button class="text-gray-500 relative">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                <span x-show="likedItems.length > 0" class="absolute -top-2 -right-2 bg-red-500 text-[10px] w-4 h-4 rounded-full flex items-center justify-center text-white" x-text="likedItems.length"></span>
-            </button>
-        </div>
-    </div>
-
-    <script>
-        function taksimPro() {
-            return {
-                loading: true,
-                currentLang: 'ar',
-                activeCategory: 'الكل',
-                activeTheme: 'theme-classic-dark',
-                menuItems: [],
-                categories: ['الكل'],
-                likedItems: JSON.parse(localStorage.getItem('taksim_v2_likes') || '[]'),
+                // تحديث الفئات والمحتوى بناءً على اللغة الجديدة
+                this.featuredItems = this.menuItems.slice(0, 5); 
+                this.lunchItems = this.menuItems.filter(i => ['المشويات', 'Grills', 'Izgaralar'].includes(i.category));
+                this.sweetItems = this.menuItems.filter(i => ['الحلويات', 'Desserts', 'Tatlılar'].includes(i.category));
+                this.categoriesList = [...new Set(this.menuItems.map(i => i.category))];
                 
-                langLinks: {
-                    ar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2026156602&single=true&output=csv',
-                    en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv',
-                    tr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=932024028&single=true&output=csv'
-                },
-
-                async loadMenu() {
-                    this.loading = true;
-                    try {
-                        const res = await fetch(this.langLinks[this.currentLang]);
-                        const text = await res.text();
-                        const rows = text.split('\n').slice(1);
-                        
-                        this.menuItems = rows.map(row => {
-                            const cols = row.split(',');
-                            return {
-                                id: cols[0]?.trim(),
-                                category: cols[1]?.trim(),
-                                name: cols[2]?.trim(),
-                                price: cols[3]?.trim(),
-                                calories: cols[4]?.trim(),
-                                description: cols[5]?.trim(),
-                                image: cols[6]?.trim()
-                            }
-                        }).filter(i => i.id);
-
-                        // استخراج الفئات الفريدة للتوبيبات
-                        const allCats = this.menuItems.map(i => i.category);
-                        this.categories = ['الكل', ...new Set(allCats)];
-                        
-                    } catch (e) { console.error(e); }
-                    this.loading = false;
-                },
-
-                get filteredItems() {
-                    if (this.activeCategory === 'الكل') return this.menuItems;
-                    return this.menuItems.filter(i => i.category === this.activeCategory);
-                },
-
-                toggleLike(id) {
-                    this.likedItems = this.likedItems.includes(id) ? this.likedItems.filter(i => i !== id) : [...this.likedItems, id];
-                    localStorage.setItem('taksim_v2_likes', JSON.stringify(this.likedItems));
-                },
-
-                isLiked(id) { return this.likedItems.includes(id); },
-                
-                init() { this.loadMenu(); }
-            }
-        }
-    </script>
-</body>
-</html>
+            } catch (e) { console.error('Error switching language:', e); }
+        },
+        // ... باقي الوظائف (initApp, openCategory, etc)
+    }
+}
+</script>
