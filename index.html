@@ -6,6 +6,8 @@
     <title>Taksim Point | المنيو الرقمي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -26,13 +28,11 @@
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; }
         .slide { min-width: 100%; scroll-snap-align: center; }
 
-        .category-silhouette { filter: brightness(0.4) contrast(1.2) grayscale(0.5); transition: all 0.3s ease; }
-        .cat-box:hover .category-silhouette { filter: brightness(0.8) contrast(1.2) grayscale(0); transform: scale(1.1); }
-
         .tiktok-container { height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .tiktok-item { height: 100dvh; scroll-snap-align: start; position: relative; }
         
-        .category-bg-blend { position: absolute; inset: 0; z-index: 0; opacity: 0.3; mask-image: linear-gradient(to bottom, black 40%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%); object-fit: cover; width: 100%; height: 100%; }
+        /* تدرج خلفيات الأقسام */
+        .category-bg-blend { position: absolute; inset: 0; z-index: 0; opacity: 0.4; mask-image: linear-gradient(to bottom, black 30%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%); object-fit: cover; width: 100%; height: 100%; }
     </style>
 </head>
 <body class="overflow-x-hidden relative" :dir="isRTL ? 'rtl' : 'ltr'" x-init="initApp()">
@@ -75,6 +75,7 @@
 
     <div x-show="isLoading" class="fixed inset-0 z-[200] bg-[#050505] flex flex-col items-center justify-center">
         <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mb-6 animate-pulse drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]">
+        <div class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase">Taksim Point...</div>
     </div>
 
     <div x-show="view === 'home' && !isLoading" x-transition.opacity.duration.500ms class="pb-32 pt-24">
@@ -108,10 +109,10 @@
             <h3 class="text-lg font-black mb-6 gold-gradient text-center uppercase tracking-widest" x-text="t('nav_menu')"></h3>
             <div class="grid grid-cols-2 gap-3">
                 <template x-for="cat in normalCategories" :key="cat">
-                    <button @click="openMenu(cat)" class="cat-box relative h-24 rounded-lg overflow-hidden border border-white/10 bg-[#111] flex items-center justify-center">
-                        <img :src="getCategoryBg(cat)" class="absolute inset-0 w-full h-full object-cover category-silhouette">
-                        <div class="absolute inset-0 bg-black/60"></div>
-                        <span class="relative z-10 text-white font-black text-sm text-center px-1 drop-shadow-lg" x-text="cat"></span>
+                    <button @click="openMenu(cat)" class="relative h-28 rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#111] group">
+                        <img :src="getCategoryBg(cat)" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-70 transition duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                        <span class="absolute bottom-3 w-full text-center text-[#D4AF37] font-black text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,1)] px-1" x-text="cat"></span>
                     </button>
                 </template>
             </div>
@@ -141,7 +142,7 @@
                                 <div class="flex justify-between items-start border-b border-white/10 pb-4 last:border-0">
                                     <div class="flex-1 pr-4">
                                         <h4 class="font-bold text-white text-base mb-1 drop-shadow" x-text="item.name"></h4>
-                                        <p class="text-[11px] text-gray-400 leading-relaxed mb-2 max-w-[90%]" x-text="item.description"></p>
+                                        <p class="text-xs text-gray-400 leading-relaxed mb-2 w-full" x-text="item.description"></p>
                                         <span class="text-[#D4AF37] font-black text-sm" x-text="item.price + ' SR'"></span>
                                     </div>
                                     <button @click="toggleLike(item)" class="p-3 bg-black/60 rounded-full border border-white/10 active:scale-90 transition backdrop-blur flex-shrink-0">
@@ -173,10 +174,10 @@
                     <span class="text-2xl font-black text-[#D4AF37] drop-shadow-lg" x-text="item.price + ' SR'"></span>
                     
                     <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center">
-                        <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
+                        <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur xl p-4 rounded-full border border-white/20 active:scale-75 transition">
                             <span class="text-3xl" x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
                         </button>
-                        <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
+                        <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur xl p-4 rounded-full border border-white/20 active:scale-75 transition">
                             <span class="text-2xl">🔗</span>
                         </button>
                     </div>
@@ -226,56 +227,48 @@
         </div>
     </div>
 
-    <audio id="sfx-pop" src="https://actions.google.com/sounds/v1/ui/click.ogg" preload="auto"></audio>
-
     <script>
         function taksimApp() {
             return {
                 isLoading: true,
                 view: 'home', 
                 currentLang: 'ar',
-                currentBranch: 'alshati', // الفرع الافتراضي
+                currentBranch: 'alshati',
                 showQRModal: false,
                 
-                // البيانات الخام
                 allRawData: [], 
-                
-                // البيانات المفلترة حسب الفرع النشط
                 activeMenuItems: [],
                 activeExploreItems: [],
                 heroOffers: [],
                 categoryBgs: {}, 
                 
                 likes: JSON.parse(localStorage.getItem('taksim_likes') || '[]'),
-                
-                // أكواد عروض الشريحة الرئيسية الجديدة بعد التعديل
                 targetHeroIds: ['TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-174', 'TP-175'],
 
-                // القاموس
                 uiDict: {
                     ar: {
                         about_title: "من تقسيم بوينت،،،،",
                         about_p1: "يعد مطعم تقسيم بوينت من أجود المطاعم التي تقدم أفضل جودة للمأكولات والمشويات التركية والعالمية والتي تتناسب مع جميع افراد المجتمع ويتميز تقسيم بوينت ايضا بالسعر المناسب بجانب الجودة والطعم اللذيذ. ويتميز مطعم تقسيم بوينت باللحوم الطازجة ١٠٠٪ التي تخضع لعناية خاصة من مزارعنا.",
                         about_p2: "ومن هذا المنطلق جعلنا من أهم مهامنا هو تقديم أفضل خدمة وأفضل جودة لجميع العملاء بلا استثناء حيث اننا نمتلك طاقماً مميزاً في جميع اقسام المطعم (المطبخ والاستقبال والضيافة والنظافة). ويطمح تقسيم بوينت الى ان يصبح من أهم المطاعم في المملكة العربية السعودية وفي العالم.",
                         nav_home: "الرئيسية", nav_menu: "الأصناف", nav_explore: "استكشاف", nav_likes: "طلباتي",
-                        branch_alshati: "فرع الواجهة", branch_almanar: "فرع المنار", branch_aljawhara: "فرع الجوهرة",
-                        copy_order: "📋 نسخ الطلب للموظف", loading: "جاري التحميل...", empty_likes: "لا توجد طلبات. اضغط على القلب لإضافتها!"
+                        branch_alshati: "الواجهة", branch_almanar: "المنار", branch_aljawhara: "الجوهرة",
+                        copy_order: "📋 نسخ الطلب للموظف", empty_likes: "لا توجد طلبات. اضغط على القلب لإضافتها!"
                     },
                     en: {
                         about_title: "From Taksim Point,,,,",
                         about_p1: "Taksim Point Restaurant is one of the finest restaurants offering the highest quality of Turkish and international cuisine and grills, suitable for everyone. It is also distinguished by its affordable prices alongside great quality and delicious taste. Taksim Point is famous for its 100% fresh meats, which receive special care from our farms.",
                         about_p2: "From this standpoint, our primary mission is to provide the best service and quality to all customers without exception. We have an outstanding team across all restaurant departments (Kitchen, Reception, Hospitality, and Hygiene). Taksim Point aspires to become one of the most prominent restaurants in the Kingdom of Saudi Arabia and the world.",
                         nav_home: "Home", nav_menu: "Menu", nav_explore: "Explore", nav_likes: "My Order",
-                        branch_alshati: "Waterfront Branch", branch_almanar: "Al-Manar Branch", branch_aljawhara: "Al-Jawhara Branch",
-                        copy_order: "📋 Copy Order", loading: "Loading...", empty_likes: "No items selected."
+                        branch_alshati: "Waterfront", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara",
+                        copy_order: "📋 Copy Order", empty_likes: "No items selected."
                     },
                     tr: {
                         about_title: "Taksim Point'ten,,,,",
                         about_p1: "Taksim Point, herkes için uygun olan en kaliteli Türk ve uluslararası yemekleri ve ızgaraları sunan en iyi restoranlardan biridir. Harika lezzetinin yanında uygun fiyatlarıyla da öne çıkar. Çiftliklerimizden özel bakım gören %100 taze etleriyle ünlüdür.",
                         about_p2: "Bu vizyonla en önemli görevimiz tüm müşterilerimize en iyi hizmeti sunmaktır. (Mutfak, Resepsiyon, Ağırlama ve Temizlik) tüm bölümlerde seçkin bir ekibe sahibiz. Taksim Point, Suudi Arabistan ve dünyadaki en önemli restoranlardan biri olmayı hedeflemektedir.",
                         nav_home: "Ana Sayfa", nav_menu: "Menü", nav_explore: "Keşfet", nav_likes: "Siparişlerim",
-                        branch_alshati: "Sahil Şubesi", branch_almanar: "Al-Manar Şubesi", branch_aljawhara: "Al-Jawhara Şubesi",
-                        copy_order: "📋 Siparişi Kopyala", loading: "Yükleniyor...", empty_likes: "Sipariş bulunamadı."
+                        branch_alshati: "Sahil", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara",
+                        copy_order: "📋 Siparişi Kopyala", empty_likes: "Sipariş bulunamadı."
                     }
                 },
 
@@ -284,7 +277,6 @@
                     ar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2026156602&single=true&output=csv',
                     en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv',
                     tr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=932024028&single=true&output=csv',
-                    // ... (باقي الروابط الـ 16 محفوظة لضمان السرعة)
                     es: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2126154876&single=true&output=csv',
                     ru: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1383179966&single=true&output=csv',
                     ur: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1356221249&single=true&output=csv',
@@ -308,41 +300,47 @@
                     try {
                         const res = await fetch(this.langLinks[this.currentLang]);
                         const text = await res.text();
-                        const rows = text.split('\n').slice(1);
                         
-                        this.allRawData = rows.map(row => {
-                            const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
-                            return {
-                                id: (cols[0] || '').replace(/"/g, '').trim(),
-                                category: (cols[1] || '').replace(/"/g, '').trim(),
-                                name: (cols[2] || '').replace(/"/g, '').trim(),
-                                price: (cols[3] || '').replace(/"/g, '').trim(),
-                                description: (cols[5] || '').replace(/"/g, '').trim(),
-                                image: (cols[6] || '').replace(/"/g, '').trim(),
-                                // قراءة بيانات توفر الفروع (الأعمدة 7، 8، 9 كما تم برمجتها سابقاً في الشيت)
-                                almanar: (cols[7] || '').replace(/"/g, '').trim(),
-                                aljawhara: (cols[8] || '').replace(/"/g, '').trim(),
-                                alshati: (cols[9] || '').replace(/"/g, '').trim()
-                            }
-                        }).filter(i => i.id && i.id.startsWith('TP-'));
+                        // استخدام PapaParse للقراءة الدقيقة الخالية من الأخطاء
+                        Papa.parse(text, {
+                            header: false,
+                            skipEmptyLines: true,
+                            complete: (results) => {
+                                const rows = results.data.slice(1); // تجاهل الهيدر
+                                
+                                let parsedData = rows.map(cols => {
+                                    return {
+                                        id: (cols[0] || '').trim(),
+                                        category: (cols[1] || '').trim(),
+                                        name: (cols[2] || '').trim(),
+                                        price: (cols[3] || '').trim(),
+                                        calories: (cols[4] || '').trim(),
+                                        description: (cols[5] || '').trim(),
+                                        image: (cols[6] || '').trim(),
+                                        almanar: (cols[7] || '').trim(),
+                                        aljawhara: (cols[8] || '').trim(),
+                                        alshati: (cols[9] || '').trim()
+                                    }
+                                }).filter(i => i.id && i.id.startsWith('TP-'));
 
-                        // استخراج صور خلفيات الأقسام (ثابتة لا تتأثر بالفروع)
-                        this.categoryBgs = {};
-                        this.allRawData.forEach(item => {
-                            const numId = parseInt(item.id.replace('TP-', ''));
-                            if(numId >= 280 && numId <= 302 && item.category) {
-                                this.categoryBgs[item.category] = item.image;
+                                this.allRawData = parsedData;
+
+                                // 1. فرز خلفيات الأقسام (من TP-280 إلى TP-302)
+                                this.categoryBgs = {};
+                                parsedData.forEach(item => {
+                                    const numId = parseInt(item.id.replace('TP-', ''));
+                                    if(numId >= 280 && numId <= 302 && item.category) {
+                                        this.categoryBgs[item.category] = item.image;
+                                    }
+                                });
+
+                                this.updateBranchData();
                             }
                         });
-
-                        this.updateBranchData(); // تحديث القائمة حسب الفرع النشط
                     } catch (e) { console.error('Data Fetch Error:', e); }
-                    this.isLoading = false;
                 },
 
-                // فلترة البيانات وتوزيعها بناءً على توفرها في الفرع الحالي
                 updateBranchData() {
-                    // استبعاد الأصناف المكتوب أمامها "غير متوفر" في فرع محدد
                     let availableItems = this.allRawData.filter(item => {
                         if (this.currentBranch === 'almanar' && item.almanar === 'غير متوفر') return false;
                         if (this.currentBranch === 'aljawhara' && item.aljawhara === 'غير متوفر') return false;
@@ -350,23 +348,20 @@
                         return true;
                     });
 
-                    // فصل الاستكشاف (التيك توك)
                     this.activeExploreItems = availableItems.filter(i => i.category === 'الاستكشاف' || i.category === 'Explore' || i.category === 'Keşfet');
 
-                    // المنيو العادي (استبعاد خلفيات الأقسام والاستكشاف)
                     this.activeMenuItems = availableItems.filter(item => {
                         const numId = parseInt(item.id.replace('TP-', ''));
                         return (numId < 280 || numId > 302) && item.category !== 'الاستكشاف' && item.category !== 'Explore' && item.category !== 'Keşfet';
                     });
 
-                    // سحب العروض للرئيسية 
                     this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
 
-                    // تحديث الرابط في المتصفح صامتاً للحفاظ على سياق المشاركة
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?branch=' + this.currentBranch;
                     window.history.replaceState({path:newUrl}, '', newUrl);
 
                     this.checkDeepLink();
+                    this.isLoading = false;
                 },
 
                 get normalCategories() {
@@ -377,7 +372,6 @@
                     return this.categoryBgs[catName] || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800';
                 },
 
-                // روابط الفروع والباركود
                 getBranchUrl() {
                     return window.location.origin + window.location.pathname + '?branch=' + this.currentBranch;
                 },
@@ -389,9 +383,7 @@
                 checkDeepLink() {
                     const urlParams = new URLSearchParams(window.location.search);
                     const branchParam = urlParams.get('branch');
-                    if(branchParam && !this.allRawData.length) {
-                        this.currentBranch = branchParam; // يتم الضبط قبل أول سحب للبيانات
-                    }
+                    if(branchParam && !this.allRawData.length) this.currentBranch = branchParam;
 
                     const exploreId = urlParams.get('explore');
                     if(exploreId) {
@@ -420,7 +412,6 @@
                 get likedItemsList() { return this.likes.map(id => this.allRawData.find(i => i.id === id)).filter(Boolean); },
 
                 toggleLike(item) {
-                    const el = document.getElementById('sfx-pop'); if(el) { el.volume = 0.3; el.currentTime = 0; el.play().catch(e=>{}); }
                     if(this.likes.includes(item.id)) this.likes = this.likes.filter(id => id !== item.id);
                     else this.likes.push(item.id);
                     localStorage.setItem('taksim_likes', JSON.stringify(this.likes));
