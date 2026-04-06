@@ -1,1 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" x-data="taksimApp()" :class="activeTheme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taksim Point - Global Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        /* نظام الثيمات العشرة */
+        .theme-classic-dark { --bg: #050505; --card: #121212; --accent: #D4AF37; --text: #FFFFFF; --muted: #A0A0A0; }
+        .theme-elegant-light { --bg: #F9F7F2; --card: #FFFFFF; --accent: #8E6D45; --text: #2D2D2D; --muted: #666666; }
+        .theme-ramadan { --bg: #001524; --card: #002138; --accent: #FFC300; --text: #F1F1F1; --muted: #8BB1C4; }
+        .theme-eid-fitr { --bg: #F0FFF4; --card: #FFFFFF; --accent: #2F855A; --text: #2D3748; --muted: #718096; }
+        .theme-eid-adha { --bg: #1A365D; --card: #2A4365; --accent: #ECC94B; --text: #FFFFFF; --muted: #A0AEC0; }
+        .theme-national { --bg: #006C35; --card: #004D26; --accent: #FFFFFF; --text: #FFFFFF; --muted: #C6F6D5; }
+        .theme-founding { --bg: #3D2B1F; --card: #4E3B2C; --accent: #D2B48C; --text: #F5F5DC; --muted: #BC8F8F; }
+        .theme-winter { --bg: #0F172A; --card: #1E293B; --accent: #38BDF8; --text: #F1F5F9; --muted: #94A3B8; }
+        .theme-summer { --bg: #FFFBEB; --card: #FFFFFF; --accent: #F59E0B; --text: #451A03; --muted: #B45309; }
+        .theme-fire { --bg: #110000; --card: #220000; --accent: #FF4500; --text: #FFD700; --muted: #CC0000; }
 
+        body { background-color: var(--bg); color: var(--text); transition: all 0.4s ease; font-family: sans-serif; }
+        .menu-card { background-color: var(--card); border: 1px solid rgba(255,255,255,0.05); }
+        .accent-text { color: var(--accent); }
+        .accent-bg { background-color: var(--accent); }
+        .accent-border { border-color: var(--accent); }
+        
+        /* تحسين مظهر الصور وتحميلها */
+        .img-container { position: relative; overflow: hidden; background: #1a1a1a; }
+        img { transition: transform 0.5s ease, opacity 0.5s ease; }
+        img.loading { opacity: 0; }
+        .menu-card:hover img { transform: scale(1.1); }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+
+    <header class="sticky top-0 z-50 backdrop-blur-lg bg-opacity-80 border-b border-white/10 p-4 accent-border" :style="'background-color:' + 'var(--bg)'">
+        <div class="max-w-7xl mx-auto flex flex-wrap gap-4 justify-between items-center">
+            <h1 class="text-2xl font-bold accent-text">Taksim Point</h1>
+            
+            <div class="flex items-center gap-3">
+                <select x-model="currentLang" @change="loadMenu()" class="bg-transparent border rounded p-1 text-sm accent-border focus:ring-1 focus:ring-yellow-500">
+                    <template x-for="(url, code) in langLinks" :key="code">
+                        <option :value="code" x-text="code.toUpperCase()" class="text-black"></option>
+                    </template>
+                </select>
+
+                <select x-model="activeTheme" class="bg-transparent border rounded p-1 text-sm accent-border focus:ring-1 focus:ring-yellow-500">
+                    <option value="theme-classic-dark" class="text-black">Classic</option>
+                    <option value="theme-elegant-light" class="text-black">Light</option>
+                    <option value="theme-ramadan" class="text-black">Ramadan</option>
+                    <option value="theme-national" class="text-black">National</option>
+                    <option value="theme-founding" class="text-black">Founding</option>
+                    <option value="theme-winter" class="text-black">Winter</option>
+                    <option value="theme-fire" class="text-black">Fire</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 mt-8">
+        <div x-show="loading" class="text-center py-20 accent-text text-xl animate-pulse">جاري جلب قائمة الطعام...</div>
+        
+        <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <template x-for="item in menuItems" :key="item.id">
+                <div class="menu-card rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:-translate-y-2">
+                    <div class="img-container h-52">
+                        <img :src="item.image || 'https://via.placeholder.com/400x300/111/D4AF37?text=Taksim+Point'" 
+                             class="w-full h-full object-cover" 
+                             loading="lazy">
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold leading-tight" x-text="item.name"></h3>
+                            <span class="accent-text font-black text-xl whitespace-nowrap" x-text="item.price + ' SR'"></span>
+                        </div>
+                        
+                        <p class="text-sm opacity-70 line-clamp-2 h-10 mb-4" x-text="item.description"></p>
+                        
+                        <div class="flex justify-between items-center border-t border-white/5 pt-4 mt-2">
+                            <span class="text-xs font-medium px-2 py-1 bg-white/10 rounded" x-text="item.calories + ' kcal'"></span>
+                            <button @click="toggleLike(item.id)" class="transition-transform active:scale-125">
+                                <svg x-show="!isLiked(item.id)" class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                <svg x-show="isLiked(item.id)" class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </main>
+
+    <script>
+        function taksimApp() {
+            return {
+                loading: true,
+                currentLang: 'ar',
+                activeTheme: 'theme-classic-dark',
+                menuItems: [],
+                likedItems: JSON.parse(localStorage.getItem('taksim_likes') || '[]'),
+                
+                // روابط الـ CSV الـ 16 التي قدمتها
+                langLinks: {
+                    ar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2026156602&single=true&output=csv',
+                    en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv',
+                    tr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=932024028&single=true&output=csv',
+                    es: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2126154876&single=true&output=csv',
+                    ru: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1383179966&single=true&output=csv',
+                    ur: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1356221249&single=true&output=csv',
+                    hi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1947060246&single=true&output=csv',
+                    fr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1967929524&single=true&output=csv',
+                    du: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=330421505&single=true&output=csv',
+                    zn: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=597359201&single=true&output=csv',
+                    ja: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1140262731&single=true&output=csv',
+                    ko: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=961009172&single=true&output=csv',
+                    it: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1885756520&single=true&output=csv',
+                    vi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=37768217&single=true&output=csv',
+                    th: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=369450170&single=true&output=csv',
+                    id: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1467238039&single=true&output=csv'
+                },
+
+                async loadMenu() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch(this.langLinks[this.currentLang]);
+                        const csvText = await response.text();
+                        this.menuItems = this.parseCSV(csvText);
+                    } catch (e) {
+                        console.error('Error fetching menu:', e);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                parseCSV(csv) {
+                    const lines = csv.split('\n');
+                    const results = [];
+                    // نبدأ من 1 لتجاوز الهيدر
+                    for(let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(',');
+                        if(cols.length < 5) continue;
+                        results.push({
+                            id: cols[0].trim(),
+                            category: cols[1].trim(),
+                            name: cols[2].trim(),
+                            price: cols[3].trim(),
+                            calories: cols[4].trim(),
+                            description: cols[5] ? cols[5].trim() : '',
+                            image: cols[6] ? cols[6].trim() : ''
+                        });
+                    }
+                    return results;
+                },
+
+                toggleLike(id) {
+                    if (this.likedItems.includes(id)) {
+                        this.likedItems = this.likedItems.filter(i => i !== id);
+                    } else {
+                        this.likedItems.push(id);
+                    }
+                    localStorage.setItem('taksim_likes', JSON.stringify(this.likedItems));
+                },
+
+                isLiked(id) {
+                    return this.likedItems.includes(id);
+                },
+
+                init() {
+                    this.loadMenu();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
