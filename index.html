@@ -31,9 +31,11 @@
         .tiktok-container { height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .tiktok-item { height: 100dvh; scroll-snap-align: start; position: relative; }
         
+        /* تدرج خلفيات الأقسام مع الحفاظ على الأبعاد */
         .category-bg-blend { position: absolute; inset: 0; z-index: 0; opacity: 0.4; mask-image: linear-gradient(to bottom, black 30%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%); object-fit: cover; object-position: center; width: 100%; height: 100%; }
         
-        .category-silhouette { filter: brightness(0.4) contrast(1.2) grayscale(0.5); transition: all 0.3s ease; object-fit: cover; object-position: center; }
+        /* كروت الأقسام الشفافة */
+        .category-silhouette { filter: brightness(0.4) contrast(1.2) grayscale(0.5); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); object-fit: cover; object-position: center; }
         .cat-box:hover .category-silhouette { filter: brightness(0.8) contrast(1.2) grayscale(0); transform: scale(1.1); }
     </style>
 </head>
@@ -69,7 +71,7 @@
             <div class="bg-white p-3 rounded-xl mb-6">
                 <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(getBranchUrl())" class="w-48 h-48">
             </div>
-            <button @click="copyBranchUrl()" class="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-600 text-black font-black py-3 rounded-lg flex items-center justify-center gap-2">
+            <button @click="copyBranchUrl()" class="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-600 text-black font-black py-3 rounded-lg flex items-center justify-center gap-2 transition active:scale-95">
                 <span>🔗</span> نسخ رابط الفرع
             </button>
         </div>
@@ -80,7 +82,14 @@
         <div class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase">Taksim Point...</div>
     </div>
 
-    <div x-show="view === 'home' && !isLoading" x-transition.opacity.duration.500ms class="pb-32 pt-24">
+    <div x-show="hasError" x-cloak class="fixed inset-0 z-[300] bg-[#050505] flex flex-col items-center justify-center p-6 text-center">
+        <span class="text-red-500 text-5xl mb-4">⚠️</span>
+        <h2 class="text-xl font-bold text-white mb-2">عذراً، حدث خطأ في جلب القائمة</h2>
+        <p class="text-gray-400 text-sm mb-6">يرجى التأكد من اتصالك بالإنترنت والمحاولة مجدداً.</p>
+        <button @click="window.location.reload()" class="bg-[#D4AF37] text-black px-6 py-2 rounded-full font-bold">تحديث الصفحة</button>
+    </div>
+
+    <div x-show="view === 'home' && !isLoading && !hasError" x-transition.opacity.duration.500ms class="pb-32 pt-24">
         
         <section class="px-6 mb-12 text-center">
             <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mx-auto mb-6 object-contain drop-shadow-2xl">
@@ -91,9 +100,9 @@
 
         <section class="relative h-[35vh] w-full mb-12 px-4">
             <div class="slider-container h-full no-scrollbar rounded-xl border border-[#D4AF37]/20 shadow-[0_0_20px_rgba(0,0,0,0.8)]" id="hero-slider">
-                <template x-for="item in heroOffers" :key="item.id">
-                    <div class="slide relative h-full">
-                        <img :src="item.image" class="w-full h-full object-cover object-center opacity-80">
+                <template x-for="(item, index) in heroOffers" :key="item.id">
+                    <div class="slide relative h-full" :id="'hero-slide-' + index">
+                        <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-80">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-5">
                             <h2 class="text-2xl font-black text-white mb-1 drop-shadow-lg" x-text="item.name"></h2>
                             <p class="text-gray-300 text-xs line-clamp-2 mb-3" x-text="item.description"></p>
@@ -112,7 +121,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <template x-for="cat in normalCategories" :key="cat">
                     <button @click="openMenu(cat)" class="cat-box relative h-28 rounded-xl overflow-hidden border border-white/10 bg-[#111] flex items-center justify-center group">
-                        <img :src="getCategoryBg(cat)" class="absolute inset-0 w-full h-full category-silhouette">
+                        <img :src="getCategoryBg(cat)" loading="lazy" class="absolute inset-0 w-full h-full category-silhouette">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20"></div>
                         <span class="relative z-10 text-[#D4AF37] font-black text-sm text-center px-1 drop-shadow-[0_2px_2px_rgba(0,0,0,1)]" x-text="cat"></span>
                     </button>
@@ -121,17 +130,17 @@
         </section>
     </div>
 
-    <div x-show="view === 'menu'" x-cloak class="min-h-screen pt-20 pb-32">
+    <div x-show="view === 'menu' && !hasError" x-cloak class="min-h-screen pt-20 pb-32">
         <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 mb-4 pb-2 border-b border-white/10 sticky top-[68px] z-40 bg-[#050505]/90 backdrop-blur">
             <template x-for="cat in normalCategories" :key="cat">
-                <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-gray-400 hover:text-[#D4AF37]" x-text="cat"></button>
+                <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-gray-400 hover:text-[#D4AF37] transition" x-text="cat"></button>
             </template>
         </div>
 
         <div class="px-4">
             <template x-for="cat in normalCategories" :key="cat">
-                <div class="mb-12 relative rounded-2xl overflow-hidden bg-[#0c0c0c] border border-white/5" :id="'cat-' + cat.replace(/\s+/g, '')">
-                    <img :src="getCategoryBg(cat)" class="category-bg-blend">
+                <div class="mb-12 relative rounded-2xl overflow-hidden bg-[#0c0c0c] border border-white/5" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
+                    <img :src="getCategoryBg(cat)" loading="lazy" class="category-bg-blend">
                     
                     <div class="relative z-10 p-5">
                         <h2 class="text-3xl font-black mb-6 text-white drop-shadow-lg flex items-center gap-3">
@@ -144,7 +153,7 @@
                                 <div class="flex justify-between items-start border-b border-white/10 pb-4 last:border-0">
                                     <div class="flex-1 pr-4">
                                         <h4 class="font-bold text-white text-base mb-1 drop-shadow" x-text="item.name"></h4>
-                                        <p class="text-xs text-gray-400 leading-relaxed mb-2 w-full" x-text="item.description"></p>
+                                        <p class="text-[11px] text-gray-300 leading-relaxed mb-2 w-full" x-text="item.description"></p>
                                         <span class="text-[#D4AF37] font-black text-sm" x-text="item.price + ' SR'"></span>
                                     </div>
                                     <button @click="toggleLike(item)" class="p-3 bg-black/60 rounded-full border border-white/10 active:scale-90 transition backdrop-blur flex-shrink-0">
@@ -159,7 +168,7 @@
         </div>
     </div>
 
-    <div x-show="view === 'explore'" x-cloak class="tiktok-container relative bg-black">
+    <div x-show="view === 'explore' && !hasError" x-cloak class="tiktok-container relative bg-black">
         <template x-for="item in activeExploreItems" :key="item.id">
             <div class="tiktok-item" :id="'explore-' + item.id">
                 
@@ -189,7 +198,7 @@
                 <template x-if="!item.isSocial">
                     <div class="w-full h-full relative">
                         <template x-if="item.isVideo || isVideo(item.image)">
-                            <video :src="item.image" autoplay loop muted playsinline class="w-full h-full object-cover object-center"></video>
+                            <video :src="item.image" autoplay loop muted playsinline preload="metadata" class="w-full h-full object-cover object-center"></video>
                         </template>
                         <template x-if="!item.isVideo && !isVideo(item.image)">
                             <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
@@ -230,7 +239,7 @@
                         <h4 class="font-bold text-sm text-white" x-text="item.name"></h4>
                         <span class="text-[#D4AF37] text-xs font-bold" x-text="item.price + ' SR'"></span>
                     </div>
-                    <button @click="toggleLike(item)" class="text-red-500 bg-red-500/10 px-3 py-2 rounded text-xs font-bold border border-red-500/20">حذف</button>
+                    <button @click="toggleLike(item)" class="text-red-500 bg-red-500/10 px-3 py-2 rounded text-xs font-bold border border-red-500/20 active:scale-95 transition">حذف</button>
                 </div>
             </template>
         </div>
@@ -260,24 +269,55 @@
         </div>
     </div>
 
+    <audio id="sfx-pop" src="https://actions.google.com/sounds/v1/ui/click.ogg" preload="none"></audio>
+
     <script>
         function taksimApp() {
             return {
                 isLoading: true,
+                hasError: false,
                 view: 'home', 
                 currentLang: 'ar',
-                currentBranch: 'alshati',
+                currentBranch: 'alshati', // افتراضي
                 showQRModal: false,
                 
                 allRawData: [], 
                 activeMenuItems: [],
                 activeExploreItems: [],
                 heroOffers: [],
+                heroIdx: 0,
+                heroInterval: null,
+                syncInterval: null,
                 
-                globalImages: {}, // قاموس يخزن كل الصور من الشيت العربي
-                categoryBgs: {},  // قاموس خلفيات الأقسام
+                // قاموس ثابت محمي للصور
+                hardcodedCategoryImages: {
+                    'TP-280': 'https://cdn.phototourl.com/free/2026-04-06-3733ce3c-98f1-468c-b546-0a760efadfb4.png',
+                    'TP-281': 'https://cdn.phototourl.com/free/2026-04-06-f989270f-bb00-4e3f-a5e8-39e299f2d567.png',
+                    'TP-282': 'https://cdn.phototourl.com/free/2026-04-06-5ace665d-db21-486a-91fd-d54d5f207e39.png',
+                    'TP-283': 'https://cdn.phototourl.com/free/2026-04-06-2a935872-3653-4ba7-a1f0-b2990b5451f7.png',
+                    'TP-284': 'https://cdn.phototourl.com/free/2026-04-06-820b7c2f-2cc5-4e72-93c0-64f6988cb3cd.png',
+                    'TP-285': 'https://cdn.phototourl.com/member/2026-04-06-5ead7e5d-9de6-45f7-9bf8-39f2db46ee8d.png',
+                    'TP-286': 'https://cdn.phototourl.com/member/2026-04-06-ecd46992-c928-417f-84c1-b642b162e8ae.png',
+                    'TP-287': 'https://cdn.phototourl.com/member/2026-04-06-402eb5e5-b124-4360-8b8a-303d1ff36669.png',
+                    'TP-288': 'https://cdn.phototourl.com/member/2026-04-06-54fa98e0-5886-433b-9cf1-adae30f16ead.png',
+                    'TP-289': 'https://cdn.phototourl.com/member/2026-04-06-38b8abf9-8d60-45ed-9e75-46e9e4b82a46.png',
+                    'TP-290': 'https://cdn.phototourl.com/member/2026-04-06-923f654d-e28d-4e62-85f4-49d2016cd7cd.png',
+                    'TP-291': 'https://cdn.phototourl.com/member/2026-04-06-d8501444-5ad3-4010-bae6-6962c0f0a9c9.png',
+                    'TP-292': 'https://cdn.phototourl.com/member/2026-04-06-9c9f2a5f-d786-41e4-9854-76b0050cb1a9.png',
+                    'TP-293': 'https://cdn.phototourl.com/member/2026-04-06-8c5d633f-7e56-4cc3-b1eb-4b26fc5315df.png',
+                    'TP-294': 'https://cdn.phototourl.com/member/2026-04-06-148386ed-4d0a-44be-bc52-df73bc6259cb.png',
+                    'TP-295': 'https://cdn.phototourl.com/free/2026-04-06-9a8bebbc-6b8c-40b6-ac90-666f87829ddc.png',
+                    'TP-296': 'https://cdn.phototourl.com/free/2026-04-06-058c2676-dc96-40c3-bc6c-8eb96096aa68.png',
+                    'TP-297': 'https://cdn.phototourl.com/free/2026-04-06-8ae64d50-457d-451e-bdaf-e074c133cd05.png',
+                    'TP-298': 'https://cdn.phototourl.com/free/2026-04-06-7637e387-a54c-485b-8914-203b58bb1ef9.png',
+                    'TP-299': 'https://cdn.phototourl.com/free/2026-04-06-51d37c77-23f8-4847-b2f2-cdb1bc707567.png',
+                    'TP-300': 'https://cdn.phototourl.com/free/2026-04-06-f37307f5-d1d2-4d41-94f6-0f68af1a35ef.png',
+                    'TP-301': 'https://cdn.phototourl.com/free/2026-04-06-6a009df7-7912-44f6-a612-fa37d7d52be4.png',
+                    'TP-302': 'https://cdn.phototourl.com/free/2026-04-06-b87b57ad-cf30-4db9-922a-152326481f5c.png'
+                },
+                categoryBgs: {}, 
                 
-                likes: JSON.parse(localStorage.getItem('taksim_likes') || '[]'),
+                likes: [],
                 targetHeroIds: ['TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-174', 'TP-175'],
 
                 uiDict: {
@@ -331,29 +371,29 @@
                 get isRTL() { return ['ar', 'ur', 'fa', 'he'].includes(this.currentLang); },
                 t(key) { const dict = this.uiDict[this.currentLang] || this.uiDict['en']; return dict[key] || this.uiDict['ar'][key] || key; },
 
-                // دالة لسحب وتخزين كل الصور من الشيت العربي الرئيسي لضمان توفرها بجميع اللغات
-                async fetchGlobalImages() {
+                // تهيئة الذاكرة المحلية بأمان تام (حماية ضد الأعطال)
+                initLocalStorage() {
                     try {
-                        const res = await fetch(this.langLinks['ar'] + '&t=' + Date.now());
-                        const text = await res.text();
-                        Papa.parse(text, {
-                            header: false, skipEmptyLines: true,
-                            complete: (results) => {
-                                results.data.slice(1).forEach(cols => {
-                                    let id = (cols[0] || '').trim();
-                                    let img = (cols[6] || '').trim();
-                                    if(id && img) this.globalImages[id] = img;
-                                });
-                            }
-                        });
-                    } catch(e) {}
+                        const saved = localStorage.getItem('taksim_likes');
+                        if(saved) {
+                            const parsed = JSON.parse(saved);
+                            if(Array.isArray(parsed)) this.likes = parsed;
+                        }
+                    } catch (e) {
+                        this.likes = [];
+                        localStorage.removeItem('taksim_likes');
+                    }
                 },
 
                 async changeLanguage(isBackgroundSync = false) {
-                    if(!isBackgroundSync) this.isLoading = true;
+                    if(!isBackgroundSync) {
+                        this.isLoading = true;
+                        this.hasError = false;
+                    }
                     try {
-                        // إضافة ?t=timestamp لمنع المتصفح من الكاش وجلب التحديثات فوراً
                         const res = await fetch(this.langLinks[this.currentLang] + '&t=' + Date.now());
+                        if (!res.ok) throw new Error('Network Issue');
+                        
                         const text = await res.text();
                         
                         Papa.parse(text, {
@@ -368,30 +408,35 @@
                                         category: (cols[1] || '').trim(),
                                         name: (cols[2] || '').trim(),
                                         price: (cols[3] || '').trim(),
+                                        calories: (cols[4] || '').trim(),
                                         description: (cols[5] || '').replace(/\r?\n|\r/g, ' ').trim(),
-                                        // إذا لم يجد صورة في الشيت المترجم، سيسحبها من الذاكرة المخبأة للشيت العربي
-                                        image: (cols[6] || '').trim() || this.globalImages[id] || '',
+                                        image: (cols[6] || '').trim(),
                                         almanar: (cols[7] || '').trim(),
                                         aljawhara: (cols[8] || '').trim(),
                                         alshati: (cols[9] || '').trim()
                                     }
                                 }).filter(i => i.id && i.id.startsWith('TP-'));
 
+                                if (parsedData.length === 0) throw new Error('No Data Parsed');
+
                                 this.allRawData = parsedData;
 
-                                // إنشاء قاموس خلفيات الأقسام بدقة
                                 this.categoryBgs = {};
                                 parsedData.forEach(item => {
-                                    const numId = parseInt(item.id.replace('TP-', ''));
-                                    if(numId >= 280 && numId <= 302 && item.category) {
-                                        this.categoryBgs[item.category] = item.image;
+                                    if(this.hardcodedCategoryImages[item.id]) {
+                                        this.categoryBgs[item.category] = this.hardcodedCategoryImages[item.id];
                                     }
                                 });
 
                                 this.updateBranchData();
-                            }
+                            },
+                            error: () => { if(!isBackgroundSync) this.hasError = true; }
                         });
-                    } catch (e) { console.error('Data Fetch Error:', e); }
+                    } catch (e) { 
+                        console.error('Data Fetch Error:', e); 
+                        if(!isBackgroundSync) this.hasError = true;
+                        this.isLoading = false;
+                    }
                 },
 
                 updateBranchData() {
@@ -402,7 +447,7 @@
                         return true;
                     });
 
-                    // 1. العناصر العادية للمنيو 
+                    // 1. المنيو العادي
                     this.activeMenuItems = availableItems.filter(item => {
                         const numId = parseInt(item.id.replace('TP-', ''));
                         return (numId < 280 || numId > 302) && !['الاستكشاف', 'Explore', 'Keşfet'].includes(item.category);
@@ -410,7 +455,7 @@
 
                     this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
 
-                    // 2. عناصر الاستكشاف وإضافة الفيديو المخصص وبطاقة السوشيال ميديا
+                    // 2. عناصر الاستكشاف وإضافة الفيديو (دعم مباشر لملف الـ MP4)
                     let dbExploreItems = availableItems.filter(i => ['الاستكشاف', 'Explore', 'Keşfet'].includes(i.category));
                     
                     const customVideo = {
@@ -418,6 +463,7 @@
                         name: 'أجواء تقسيم بوينت',
                         description: 'شاهد الفخامة والمذاق الأصيل في أروقة مطاعمنا.',
                         price: '',
+                        // رابط الـ mp4 الذي رفعته، تم إضافته ليعمل فوراً دون مشاكل CORS
                         image: 'https://drive.google.com/uc?export=download&id=1AbI4yPT8MqLWciJrts2SY66UYkwmmRQm',
                         category: 'استكشاف',
                         isVideo: true,
@@ -438,15 +484,31 @@
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?branch=' + this.currentBranch;
                     window.history.replaceState({path:newUrl}, '', newUrl);
 
+                    this.startAutoScroll();
                     this.checkDeepLink();
                     this.isLoading = false;
                 },
 
-                // التحديث التلقائي الصامت كل 60 ثانية (Live Sync)
+                // حماية تسرب الذاكرة وتنظيف الـ Interval
+                startAutoScroll() {
+                    if(this.heroInterval) clearInterval(this.heroInterval);
+                    
+                    this.heroInterval = setInterval(() => {
+                        const el = document.getElementById('hero-slider');
+                        if(el && el.children.length > 0) {
+                            this.heroIdx = (this.heroIdx + 1) % this.heroOffers.length;
+                            const targetSlide = document.getElementById('hero-slide-' + this.heroIdx);
+                            if(targetSlide) {
+                                targetSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                            }
+                        }
+                    }, 5000);
+                },
+
+                // التحديث الآمن
                 startBackgroundSync() {
-                    setInterval(() => {
-                        this.changeLanguage(true); // true تعني تحديث صامت بدون شاشة تحميل
-                    }, 60000);
+                    if(this.syncInterval) clearInterval(this.syncInterval);
+                    this.syncInterval = setInterval(() => { this.changeLanguage(true); }, 60000);
                 },
 
                 get normalCategories() {
@@ -462,9 +524,6 @@
 
                 checkDeepLink() {
                     const urlParams = new URLSearchParams(window.location.search);
-                    const branchParam = urlParams.get('branch');
-                    if(branchParam && !this.allRawData.length) this.currentBranch = branchParam;
-
                     const exploreId = urlParams.get('explore');
                     if(exploreId) {
                         this.view = 'explore';
@@ -484,7 +543,9 @@
 
                 scrollToCat(cat) {
                     setTimeout(() => {
-                        const el = document.getElementById('cat-' + cat.replace(/\s+/g, ''));
+                        // حماية لضمان توافق الـ ID مع المعايير (بدون مسافات ورموز خاصة)
+                        const safeCatId = btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '');
+                        const el = document.getElementById('cat-' + safeCatId);
                         if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth'});
                     }, 100);
                 },
@@ -492,6 +553,9 @@
                 get likedItemsList() { return this.likes.map(id => this.allRawData.find(i => i.id === id)).filter(Boolean); },
 
                 toggleLike(item) {
+                    const audio = document.getElementById('sfx-pop');
+                    if(audio) { audio.volume = 0.3; audio.currentTime = 0; audio.play().catch(e=>{}); }
+                    
                     if(this.likes.includes(item.id)) this.likes = this.likes.filter(id => id !== item.id);
                     else this.likes.push(item.id);
                     localStorage.setItem('taksim_likes', JSON.stringify(this.likes));
@@ -511,15 +575,15 @@
                     navigator.clipboard.writeText(text).then(() => alert('تم النسخ بنجاح!'));
                 },
 
-                async initApp() { 
+                initApp() { 
+                    this.initLocalStorage(); // تهيئة الذاكرة بشكل آمن
+                    
                     const urlParams = new URLSearchParams(window.location.search);
-                    if(urlParams.get('branch')) this.currentBranch = urlParams.get('branch');
+                    const allowedBranches = ['alshati', 'almanar', 'aljawhara'];
+                    let b = urlParams.get('branch');
+                    if(b && allowedBranches.includes(b)) this.currentBranch = b; // التحقق الأمني للرابط
                     
-                    // سحب الصور من العربي لضمان توفرها للغات الأخرى أولاً
-                    await this.fetchGlobalImages();
-                    await this.changeLanguage(); 
-                    
-                    // تشغيل المزامنة التلقائية
+                    this.changeLanguage(); 
                     this.startBackgroundSync();
                 }
             }
