@@ -24,6 +24,9 @@
             --glass-nav: rgba(10, 10, 10, 0.95);
             --marble-img: url('https://www.transparenttextures.com/patterns/black-mamba.png');
             --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
+            
+            /* تدرج الـ PDF للوضع الليلي (صلب يسار، شفاف يمين) */
+            --pdf-gradient: linear-gradient(to right, var(--bg-main) 45%, rgba(10, 10, 10, 0.85) 65%, transparent 100%);
         }
         
         .light-theme {
@@ -36,6 +39,9 @@
             --glass-nav: rgba(255, 255, 255, 0.98);
             --marble-img: url('https://www.transparenttextures.com/patterns/white-marble.png');
             --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 60%);
+            
+            /* تدرج الـ PDF للوضع النهاري (صلب يسار، شفاف يمين) */
+            --pdf-gradient: linear-gradient(to right, var(--bg-main) 45%, rgba(252, 252, 252, 0.85) 65%, transparent 100%);
         }
         
         body { 
@@ -67,33 +73,26 @@
         .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s; object-fit: cover; object-position: center; }
         .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
 
-        /* ==== تصميم الـ PDF (المحاذاة الجديدة) ==== */
-        /* التدرج اللوني الذي يغطي الصورة تحت النص (يمثل المنطقة الحمراء في رسمك) */
+        /* ==== الحل الجذري لأبعاد صور الـ PDF ==== */
+        .pdf-image {
+            position: absolute; 
+            inset: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            /* هذا السطر يضمن أن الجهة اليمنى (الأكل) هي التي تظهر دائماً */
+            object-position: right center; 
+            z-index: 0;
+            opacity: 0.95;
+        }
+        
         .pdf-overlay {
-            position: absolute; inset: 0; z-index: 10; pointer-events: none;
-            /* تغطية قوية من اليسار، شفافة من اليمين */
-            background: linear-gradient(to right, var(--bg-main) 50%, rgba(var(--bg-main), 0.8) 70%, transparent 100%);
-        }
-        
-        /* إزاحة الصورة لليمين وإعطائها شفافية مدرجة */
-        .category-bg-blend { 
-            position: absolute; inset: 0; z-index: 0; opacity: 0.75; 
-            /* إزاحة الصورة بحيث يظهر الجانب الأيمن منها (المنطقة الخضراء) */
-            object-position: 80% center; 
-            object-fit: cover;
-            /* قناع يخفي الـ 25% اليسرى من الصورة تقريباً (المنطقة الحمراء) */
-            mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
-        }
-        
-        /* تعديلات شاشات الكمبيوتر */
-        @media (min-width: 768px) {
-            .pdf-overlay { background: linear-gradient(to right, var(--bg-main) 40%, rgba(var(--bg-main), 0.5) 60%, transparent 100%); }
-            .category-bg-blend { 
-                object-position: right center; opacity: 0.9; 
-                mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 70%);
-                -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 70%);
-            }
+            position: absolute; 
+            inset: 0; 
+            z-index: 10; 
+            pointer-events: none;
+            /* التدرج يسحب من اليسار لليمين باستخدام المتغيرات */
+            background: var(--pdf-gradient);
         }
     </style>
 </head>
@@ -251,11 +250,11 @@
             <template x-for="cat in normalCategories" :key="cat">
                 <div class="mb-16 relative rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.5)] border border-[var(--border-color)] scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
                     
-                    <img :src="getCategoryBg(cat)" loading="lazy" class="category-bg-blend">
+                    <img :src="getCategoryBg(cat)" loading="lazy" class="pdf-image">
                     
                     <div class="pdf-overlay"></div>
                     
-                    <div class="absolute inset-y-0 w-[85%] md:w-[65%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" :class="isRTL ? 'right-0' : 'left-0'">
+                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[55%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
                         
                         <h2 class="text-3xl md:text-5xl font-black mb-8 text-[#D4AF37] drop-shadow-[0_2px_15px_rgba(0,0,0,1)] flex items-center gap-3">
                             <span class="w-2 h-10 bg-[#D4AF37] rounded-full shadow-lg"></span>
@@ -272,13 +271,14 @@
                                 <div class="flex flex-col relative group">
                                     
                                     <div class="flex items-end w-full mb-1">
-                                        <h4 class="font-black text-[var(--text-main)] text-sm md:text-base drop-shadow-md whitespace-nowrap" x-text="item.name"></h4>
+                                        <h4 class="font-black text-[var(--text-main)] text-sm md:text-base drop-shadow-md whitespace-nowrap max-w-[65%] truncate" x-text="item.name"></h4>
                                         <div class="flex-1 border-b-2 border-dotted border-[var(--border-color)] mx-2 relative top-[-6px] opacity-70"></div>
                                         <span class="text-[#D4AF37] font-black text-sm md:text-base drop-shadow-md whitespace-nowrap" x-text="item.price + ' SR'"></span>
                                     </div>
                                     
                                     <div class="flex justify-between items-start gap-2">
-                                        <p class="text-[10px] md:text-xs text-[var(--text-muted)] leading-relaxed font-semibold line-clamp-2 w-[80%]" x-text="item.description"></p>
+                                        <p class="text-[10px] md:text-xs text-[var(--text-muted)] leading-relaxed font-semibold line-clamp-2 w-[75%]" x-text="item.description"></p>
+                                        
                                         <div class="flex items-center gap-2">
                                             <button @click="toggleLike(item)" class="p-1.5 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
                                                 <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-[10px]"></span>
@@ -505,7 +505,7 @@
 
                 handleScroll() {
                     const currentY = window.pageYOffset;
-                    this.showCatBar = currentY < this.lastScroll || currentY < 150;
+                    this.showCatBar = currentY <= this.lastScroll || currentY < 100;
                     this.lastScroll = currentY;
                 },
 
@@ -521,7 +521,6 @@
                     }
                 },
 
-                // سحب صور جميع اللغات من الملف العربي (نظام الذاكرة المركزية)
                 async fetchGlobalImages() {
                     try {
                         const res = await fetch(this.langLinks['ar'] + '&t=' + Date.now());
@@ -558,7 +557,6 @@
                                     let cat = (cols[1] || '').trim();
                                     let numId = parseInt(id.replace('TP-', ''));
                                     
-                                    // النطاق الجديد للبحث عن صور الأقسام
                                     if(numId >= 250 && numId <= 400 && cat) {
                                         this.categoryBgs[cat] = (cols[6] || '').trim() || this.globalImages[id] || '';
                                         this.emptyBgCategories.push(cat);
@@ -644,7 +642,6 @@
                     let cats = [...new Set(this.activeMenuItems.map(i => i.category))];
                     cats = [...new Set([...cats, ...this.emptyBgCategories])].filter(c => c !== '');
                     
-                    // فرز "المقدمة" لتكون الأولى دائماً
                     const introKeywords = ['مقدم', 'intro', 'giriş'];
                     let introCat = cats.find(c => introKeywords.some(k => c.toLowerCase().includes(k)));
                     if(introCat) {
@@ -654,14 +651,8 @@
                     return cats; 
                 },
                 
-                getCatItems(cat) {
-                    return this.activeMenuItems.filter(i => i.category === cat);
-                },
-
-                // تحديد إذا كان هذا القسم هو المقدمة
-                isIntro(cat) {
-                    return ['مقدم', 'intro', 'giriş'].some(k => cat.toLowerCase().includes(k));
-                },
+                getCatItems(cat) { return this.activeMenuItems.filter(i => i.category === cat); },
+                isIntro(cat) { return ['مقدم', 'intro', 'giriş'].some(k => cat.toLowerCase().includes(k)); },
 
                 getCatEmoji(cat) {
                     const c = cat.toLowerCase();
@@ -733,6 +724,12 @@
                     else { navigator.clipboard.writeText(url); alert('تم نسخ الرابط!'); }
                 },
 
+                copyOrder() {
+                    let text = "طلبي من تقسيم بوينت (" + this.t('branch_'+this.currentBranch) + "):\n\n";
+                    this.likedItemsList.forEach(item => text += `- ${item.name} | ${item.price} SR\n`);
+                    navigator.clipboard.writeText(text).then(() => alert('تم النسخ بنجاح!'));
+                },
+
                 async initApp() { 
                     this.initLocalStorage(); 
                     
@@ -741,7 +738,6 @@
                     let b = urlParams.get('branch');
                     if(b && allowedBranches.includes(b)) this.currentBranch = b; 
                     
-                    // سحب الصور المركزية قبل تحميل اللغة الحالية
                     await this.fetchGlobalImages();
                     await this.changeLanguage(); 
                     
