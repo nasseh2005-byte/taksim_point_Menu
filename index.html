@@ -10,7 +10,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         :root { 
@@ -25,8 +26,8 @@
             --marble-img: url('https://www.transparenttextures.com/patterns/black-mamba.png');
             --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
             
-            /* تدرج الـ PDF للوضع الليلي (صلب يسار، شفاف يمين) */
-            --pdf-gradient: linear-gradient(to right, var(--bg-main) 45%, rgba(10, 10, 10, 0.85) 65%, transparent 100%);
+            /* تدرج الجوال: صلب جداً في اليسار، ثم شفاف سريعاً لإظهار 80% من الأكل */
+            --pdf-gradient: linear-gradient(to right, var(--bg-main) 5%, rgba(10, 10, 10, 0.85) 30%, rgba(10, 10, 10, 0.3) 60%, transparent 100%);
         }
         
         .light-theme {
@@ -40,12 +41,12 @@
             --marble-img: url('https://www.transparenttextures.com/patterns/white-marble.png');
             --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 60%);
             
-            /* تدرج الـ PDF للوضع النهاري (صلب يسار، شفاف يمين) */
-            --pdf-gradient: linear-gradient(to right, var(--bg-main) 45%, rgba(252, 252, 252, 0.85) 65%, transparent 100%);
+            /* تدرج الجوال للوضع النهاري */
+            --pdf-gradient: linear-gradient(to right, var(--bg-main) 5%, rgba(252, 252, 252, 0.85) 30%, rgba(252, 252, 252, 0.3) 60%, transparent 100%);
         }
         
         body { 
-            font-family: 'Cairo', sans-serif; 
+            font-family: 'Tajawal', sans-serif; /* تفعيل الخط الفاخر */
             background-color: var(--bg-main); 
             background-image: var(--gold-glow), var(--marble-img);
             background-attachment: fixed;
@@ -73,17 +74,19 @@
         .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s; object-fit: cover; object-position: center; }
         .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
 
-        /* ==== الحل الجذري لأبعاد صور الـ PDF ==== */
+        /* ==== هندسة أبعاد صورة الـ PDF ==== */
         .pdf-image {
             position: absolute; 
             inset: 0; 
             width: 100%; 
             height: 100%; 
             object-fit: cover; 
-            /* هذا السطر يضمن أن الجهة اليمنى (الأكل) هي التي تظهر دائماً */
-            object-position: right center; 
+            object-position: right center; /* الأكل مثبت باليمين دائماً */
             z-index: 0;
             opacity: 0.95;
+            /* في الجوال: إظهار الصورة بنسبة 80% */
+            mask-image: linear-gradient(to right, transparent 0%, black 20%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
         }
         
         .pdf-overlay {
@@ -91,8 +94,16 @@
             inset: 0; 
             z-index: 10; 
             pointer-events: none;
-            /* التدرج يسحب من اليسار لليمين باستخدام المتغيرات */
-            background: var(--pdf-gradient);
+            background: var(--pdf-gradient); /* يسحب من التدرج المخصص فوق */
+        }
+        
+        /* تعديلات شاشات الكمبيوتر للحفاظ على جمالها */
+        @media (min-width: 768px) {
+            .pdf-overlay { background: linear-gradient(to right, var(--bg-main) 40%, rgba(10, 10, 10, 0.5) 60%, transparent 100%); }
+            .pdf-image { 
+                mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
+            }
         }
     </style>
 </head>
@@ -133,7 +144,7 @@
             <button @click="showSearchModal = false; searchQuery = ''" class="text-[#D4AF37] p-2 hover:bg-[#D4AF37]/10 rounded-full transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <input type="text" x-model="searchQuery" :placeholder="t('search_placeholder')" class="flex-1 theme-card rounded-lg px-4 py-2.5 text-[var(--text-main)] text-sm outline-none focus:border-[#D4AF37] shadow-inner">
+            <input type="text" x-model="searchQuery" :placeholder="t('search_placeholder')" class="flex-1 theme-card rounded-lg px-4 py-2.5 text-[var(--text-main)] text-sm outline-none focus:border-[#D4AF37] shadow-inner font-bold">
         </div>
         
         <div class="flex-1 overflow-y-auto p-5 pb-32">
@@ -157,8 +168,8 @@
                             <img :src="item.image" class="w-16 h-16 rounded-lg object-cover">
                             <div class="flex-1">
                                 <h4 class="text-sm font-bold line-clamp-1" x-text="item.name"></h4>
-                                <p class="text-[10px] text-[#D4AF37] mb-1" x-text="item.category"></p>
-                                <span class="font-bold text-xs" x-text="item.price + ' SR'"></span>
+                                <p class="text-[10px] text-[#D4AF37] mb-1 font-bold" x-text="item.category"></p>
+                                <span class="font-black text-xs" x-text="item.price + ' SR'"></span>
                             </div>
                             <button @click="toggleLike(item)" class="p-3 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition">
                                 <span x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
@@ -175,7 +186,7 @@
         <button @click="showQRModal = false" class="absolute top-6 right-6 text-white text-3xl font-black">✕</button>
         <div class="theme-card border-[#D4AF37]/50 p-8 rounded-2xl flex flex-col items-center shadow-[0_0_40px_rgba(212,175,55,0.3)]">
             <h2 class="text-[#D4AF37] font-black text-xl mb-1 text-center" x-text="t('branch_' + currentBranch)"></h2>
-            <p class="text-[var(--text-muted)] text-xs mb-6 text-center">قم بمسح الباركود للوصول السريع</p>
+            <p class="text-[var(--text-muted)] text-xs mb-6 text-center font-bold">قم بمسح الباركود للوصول السريع</p>
             <div class="bg-white p-3 rounded-xl mb-6">
                 <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(getBranchUrl())" class="w-48 h-48">
             </div>
@@ -187,7 +198,7 @@
 
     <div x-show="isLoading" class="fixed inset-0 z-[200] bg-[var(--bg-main)] flex flex-col items-center justify-center" :style="'background-image: var(--marble-img);'">
         <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mb-6 animate-pulse drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]">
-        <div class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase">Taksim Point...</div>
+        <div class="text-[#D4AF37] text-sm font-black tracking-widest uppercase">Taksim Point...</div>
     </div>
 
     <div x-show="hasError" x-cloak class="fixed inset-0 z-[300] bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
@@ -200,8 +211,8 @@
         <section class="px-6 mb-12 text-center">
             <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mx-auto mb-6 object-contain drop-shadow-2xl">
             <h1 class="text-2xl font-black gold-gradient mb-4 text-center" x-text="t('about_title')"></h1>
-            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-justify px-2 mb-4 font-semibold" x-text="t('about_p1')"></p>
-            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-justify px-2 font-semibold" x-text="t('about_p2')"></p>
+            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-justify px-2 mb-4 font-bold" x-text="t('about_p1')"></p>
+            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-justify px-2 font-bold" x-text="t('about_p2')"></p>
         </section>
 
         <section class="relative h-[35vh] w-full mb-12 px-4">
@@ -211,10 +222,10 @@
                         <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-5">
                             <h2 class="text-2xl font-black text-white mb-1 drop-shadow-lg" x-text="item.name"></h2>
-                            <p class="text-gray-300 text-xs line-clamp-2 mb-3" x-text="item.description"></p>
+                            <p class="text-gray-300 text-xs line-clamp-2 mb-3 font-bold" x-text="item.description"></p>
                             <div class="flex justify-between items-center">
-                                <span class="text-xl font-bold text-[#D4AF37]" x-text="item.price + ' SR'"></span>
-                                <button @click="scrollToCat(item.category)" class="bg-[#D4AF37] text-black px-4 py-1.5 text-xs font-bold rounded shadow-lg">الطلب ➔</button>
+                                <span class="text-xl font-black text-[#D4AF37]" x-text="item.price + ' SR'"></span>
+                                <button @click="scrollToCat(item.category)" class="bg-[#D4AF37] text-black px-4 py-1.5 text-xs font-black rounded shadow-lg">الطلب ➔</button>
                             </div>
                         </div>
                     </div>
@@ -254,39 +265,39 @@
                     
                     <div class="pdf-overlay"></div>
                     
-                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[55%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
+                    <div class="absolute inset-y-0 left-0 w-[75%] md:w-[50%] z-20 p-4 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
                         
-                        <h2 class="text-3xl md:text-5xl font-black mb-8 text-[#D4AF37] drop-shadow-[0_2px_15px_rgba(0,0,0,1)] flex items-center gap-3">
-                            <span class="w-2 h-10 bg-[#D4AF37] rounded-full shadow-lg"></span>
+                        <h2 class="text-2xl md:text-5xl font-black mb-6 text-[#D4AF37] drop-shadow-[0_2px_15px_rgba(0,0,0,1)] flex items-center gap-3">
+                            <span class="w-1.5 h-8 bg-[#D4AF37] rounded-full shadow-lg"></span>
                             <span x-text="cat" class="text-[var(--text-main)]"></span>
                         </h2>
                         
                         <div x-show="isIntro(cat) && getCatItems(cat).length === 0" class="text-[var(--text-main)] drop-shadow-md">
-                            <p class="text-sm leading-loose mb-4 font-bold" x-text="t('about_p1')"></p>
-                            <p class="text-sm leading-loose font-bold" x-text="t('about_p2')"></p>
+                            <p class="text-xs md:text-sm leading-loose mb-4 font-bold" x-text="t('about_p1')"></p>
+                            <p class="text-xs md:text-sm leading-loose font-bold" x-text="t('about_p2')"></p>
                         </div>
 
-                        <div class="flex flex-col gap-6 pb-20">
+                        <div class="flex flex-col gap-5 pb-20">
                             <template x-for="item in getCatItems(cat)" :key="item.id">
                                 <div class="flex flex-col relative group">
                                     
-                                    <div class="flex items-end w-full mb-1">
-                                        <h4 class="font-black text-[var(--text-main)] text-sm md:text-base drop-shadow-md whitespace-nowrap max-w-[65%] truncate" x-text="item.name"></h4>
-                                        <div class="flex-1 border-b-2 border-dotted border-[var(--border-color)] mx-2 relative top-[-6px] opacity-70"></div>
-                                        <span class="text-[#D4AF37] font-black text-sm md:text-base drop-shadow-md whitespace-nowrap" x-text="item.price + ' SR'"></span>
+                                    <div class="flex items-end w-full mb-1 gap-1">
+                                        <h4 class="font-black text-[var(--text-main)] text-[11px] md:text-base drop-shadow-md leading-tight whitespace-normal max-w-[70%]" x-text="item.name"></h4>
+                                        <div class="flex-1 border-b-2 border-dotted border-[var(--border-color)] relative top-[-4px] opacity-70 min-w-[10px]"></div>
+                                        <span class="text-[#D4AF37] font-black text-[11px] md:text-base drop-shadow-md whitespace-nowrap" x-text="item.price + ' SR'"></span>
                                     </div>
                                     
                                     <div class="flex justify-between items-start gap-2">
-                                        <p class="text-[10px] md:text-xs text-[var(--text-muted)] leading-relaxed font-semibold line-clamp-2 w-[75%]" x-text="item.description"></p>
+                                        <p class="text-[9px] md:text-xs text-[var(--text-muted)] leading-relaxed font-bold line-clamp-2 w-[80%]" x-text="item.description"></p>
                                         
                                         <div class="flex items-center gap-2">
-                                            <button @click="toggleLike(item)" class="p-1.5 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
+                                            <button @click="toggleLike(item)" class="p-1 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
                                                 <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-[10px]"></span>
                                             </button>
-                                            <div x-show="isLiked(item.id)" class="flex items-center gap-3 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-2 py-1 shadow-lg" x-transition>
-                                                <button @click="updateQty(item.id, -1)" class="text-[#D4AF37] text-sm font-bold px-1 hover:scale-110">-</button>
-                                                <span class="text-xs font-bold text-[var(--text-main)] w-3 text-center" x-text="quantities[item.id] || 1"></span>
-                                                <button @click="updateQty(item.id, 1)" class="text-[#D4AF37] text-sm font-bold px-1 hover:scale-110">+</button>
+                                            <div x-show="isLiked(item.id)" class="flex items-center gap-2 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-1.5 py-0.5 shadow-lg" x-transition>
+                                                <button @click="updateQty(item.id, -1)" class="text-[#D4AF37] text-sm font-black px-1 hover:scale-110">-</button>
+                                                <span class="text-[10px] font-black text-[var(--text-main)] w-3 text-center" x-text="quantities[item.id] || 1"></span>
+                                                <button @click="updateQty(item.id, 1)" class="text-[#D4AF37] text-sm font-black px-1 hover:scale-110">+</button>
                                             </div>
                                         </div>
                                     </div>
@@ -308,7 +319,7 @@
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] z-50">
                         <img :src="item.image" class="h-28 mb-8 drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]">
                         <h2 class="text-3xl font-black text-[#D4AF37] mb-4 text-center" x-text="item.name"></h2>
-                        <p class="text-gray-300 text-center mb-10 text-sm leading-relaxed" x-text="item.description"></p>
+                        <p class="text-gray-300 text-center mb-10 text-sm leading-relaxed font-bold" x-text="item.description"></p>
                         <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
                             <a href="https://www.tiktok.com/@taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition"><span class="text-2xl">🎵</span><span class="text-xs font-bold text-white">TikTok</span></a>
                             <a href="https://www.instagram.com/taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition"><span class="text-2xl">📸</span><span class="text-xs font-bold text-white">Instagram</span></a>
@@ -329,7 +340,7 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32">
                             <span class="bg-red-600/80 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2 uppercase" x-text="t('nav_explore')"></span>
                             <h2 class="text-3xl font-black mb-2 text-white drop-shadow-xl" x-text="item.name"></h2>
-                            <p class="text-gray-200 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3" x-text="item.description"></p>
+                            <p class="text-gray-200 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3 font-bold" x-text="item.description"></p>
                             <template x-if="item.price"><span class="text-2xl font-black text-[#D4AF37] drop-shadow-lg" x-text="item.price + ' SR'"></span></template>
                             <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center">
                                 <template x-if="!item.custom">
@@ -350,24 +361,24 @@
 
     <div x-show="view === 'likes'" x-transition x-cloak class="min-h-screen pt-20 pb-32 px-4">
         <h2 class="text-2xl font-black text-center mb-8 gold-gradient uppercase" x-text="t('nav_likes')"></h2>
-        <div x-show="likes.length === 0" class="text-center mt-20 text-[var(--text-muted)] font-bold" x-text="t('empty_likes')"></div>
+        <div x-show="likes.length === 0" class="text-center mt-20 text-[var(--text-muted)] font-black" x-text="t('empty_likes')"></div>
 
         <div class="flex flex-col gap-4 mb-10">
             <template x-for="item in likedItemsList" :key="item.id">
                 <div class="theme-card p-3 flex flex-col gap-3 rounded-xl border border-[var(--border-color)] shadow-sm">
                     <div class="flex justify-between items-center">
                         <div class="flex-1 px-2">
-                            <h4 class="font-bold text-sm" x-text="item.name"></h4>
-                            <span class="text-[#D4AF37] text-xs font-bold" x-text="item.price + ' SR'"></span>
+                            <h4 class="font-black text-sm" x-text="item.name"></h4>
+                            <span class="text-[#D4AF37] text-xs font-black" x-text="item.price + ' SR'"></span>
                         </div>
                         <button @click="toggleLike(item)" class="text-red-500 bg-red-500/10 px-3 py-2 rounded text-xs font-bold border border-red-500/20 active:scale-95 transition">حذف</button>
                     </div>
                     <div class="flex justify-between items-center px-2 pt-2 border-t border-[var(--border-color)]">
-                        <span class="text-xs text-[var(--text-muted)] font-bold">الكمية:</span>
+                        <span class="text-xs text-[var(--text-muted)] font-black">الكمية:</span>
                         <div class="flex items-center gap-4 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-3 py-1">
-                            <button @click="updateQty(item.id, -1)" class="text-lg font-bold text-[#D4AF37] hover:scale-110 transition">-</button>
-                            <span class="font-bold text-sm w-4 text-center text-[var(--text-main)]" x-text="quantities[item.id] || 1"></span>
-                            <button @click="updateQty(item.id, 1)" class="text-lg font-bold text-[#D4AF37] hover:scale-110 transition">+</button>
+                            <button @click="updateQty(item.id, -1)" class="text-lg font-black text-[#D4AF37] hover:scale-110 transition">-</button>
+                            <span class="font-black text-sm w-4 text-center text-[var(--text-main)]" x-text="quantities[item.id] || 1"></span>
+                            <button @click="updateQty(item.id, 1)" class="text-lg font-black text-[#D4AF37] hover:scale-110 transition">+</button>
                         </div>
                     </div>
                 </div>
@@ -388,7 +399,7 @@
                 <template x-for="item in likedItemsList" :key="item.id">
                     <div class="flex justify-between items-center border-b border-[var(--border-color)] border-dashed py-3 last:border-0">
                         <div class="flex-1 pr-2">
-                            <h4 class="font-bold text-sm text-[var(--text-main)]" x-text="item.name"></h4>
+                            <h4 class="font-black text-sm text-[var(--text-main)]" x-text="item.name"></h4>
                             <div class="flex gap-2 text-[10px] text-[var(--text-muted)] mt-1 font-bold">
                                 <span x-text="'الكمية: ' + (quantities[item.id] || 1)"></span>
                                 <span x-show="item.calories">|</span>
@@ -400,7 +411,7 @@
                 </template>
             </div>
             <div class="p-4 bg-[var(--section-bg)] border-t border-[var(--border-color)] relative z-10 text-center">
-                <p class="text-xs font-bold text-[var(--text-main)]" x-text="t('waiter_note')"></p>
+                <p class="text-xs font-black text-[var(--text-main)]" x-text="t('waiter_note')"></p>
             </div>
         </div>
     </div>
@@ -409,20 +420,20 @@
         <div class="flex justify-between items-center max-w-md mx-auto">
             <button @click="view = 'home'" :class="view === 'home' ? 'text-[#D4AF37]' : 'text-[var(--text-muted)]'" class="flex flex-col items-center gap-1 w-1/4">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3l9 7.5v10.5h-6v-6h-6v6h-6v-10.5z"/></svg>
-                <span class="text-[10px] font-bold" x-text="t('nav_home')"></span>
+                <span class="text-[10px] font-black" x-text="t('nav_home')"></span>
             </button>
             <button @click="view = 'menu'" :class="view === 'menu' ? 'text-[#D4AF37]' : 'text-[var(--text-muted)]'" class="flex flex-col items-center gap-1 w-1/4">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                <span class="text-[10px] font-bold" x-text="t('nav_menu')"></span>
+                <span class="text-[10px] font-black" x-text="t('nav_menu')"></span>
             </button>
             <button @click="view = 'explore'" :class="view === 'explore' ? 'text-[#D4AF37]' : 'text-[var(--text-muted)]'" class="flex flex-col items-center gap-1 w-1/4">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span class="text-[10px] font-bold" x-text="t('nav_explore')"></span>
+                <span class="text-[10px] font-black" x-text="t('nav_explore')"></span>
             </button>
             <button @click="view = 'likes'" :class="view === 'likes' ? 'text-[#D4AF37]' : 'text-[var(--text-muted)]'" class="flex flex-col items-center gap-1 relative w-1/4">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 <span x-show="likes.length > 0" class="absolute -top-1 right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center" x-text="likes.length"></span>
-                <span class="text-[10px] font-bold" x-text="t('nav_likes')"></span>
+                <span class="text-[10px] font-black" x-text="t('nav_likes')"></span>
             </button>
         </div>
     </div>
