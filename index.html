@@ -16,7 +16,7 @@
     <style>
         :root { 
             --gold: #D4AF37; 
-            --white-gold: #e8d9b6; /* الذهبي المبيض الفاخر */
+            --white-gold: #e8d9b6; /* اللون الذهبي المبيض الصريح */
             --bg-main: #080808; 
             --text-main: #ffffff;
             --card-bg: rgba(18, 18, 18, 0.8);
@@ -41,19 +41,9 @@
         [x-cloak] { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* التدرج اللوني الملكي واللميعة للخطوط */
-        .royal-text-gradient {
-            background: linear-gradient(135deg, #ffffff 10%, var(--white-gold) 60%, #af8a26 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-            filter: drop-shadow(0px 0px 4px rgba(232, 217, 182, 0.3)); /* توهج خفيف للعنوان */
-        }
-
-        /* كلاس اللميعة الجديد للوصف والنصوص لتكون واضحة وفخمة */
-        .glow-gold {
-            color: var(--white-gold);
-            text-shadow: 0 0 8px rgba(232, 217, 182, 0.5);
+        /* كلاس اللون الموحد والنظيف (بدون تدرجات تعطب الجوال) */
+        .text-brand-gold {
+            color: var(--white-gold) !important;
         }
 
         .pdf-title-ar { font-family: 'Cairo', sans-serif; font-weight: 900; }
@@ -81,14 +71,14 @@
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
         }
         
-        /* تدرج الجوال المطور (ناعم ويوضح الصورة أكثر مع بقاء الخلفية داكنة تحت النص) */
+        /* تظليل صلب جداً خلف النص لحمايته من ألوان الصورة */
         .pdf-overlay { 
             position: absolute; inset: 0; z-index: 10; pointer-events: none; 
-            background: linear-gradient(to right, rgba(8,8,8, 0.95) 40%, rgba(8,8,8, 0.7) 65%, transparent 100%); 
+            background: linear-gradient(to right, rgba(8,8,8, 0.98) 50%, rgba(8,8,8, 0.8) 70%, transparent 100%); 
         }
         
         @media (min-width: 768px) {
-            .pdf-overlay { background: linear-gradient(to right, rgba(8,8,8, 0.95) 30%, rgba(8,8,8, 0.6) 55%, transparent 100%); }
+            .pdf-overlay { background: linear-gradient(to right, rgba(8,8,8, 0.98) 35%, rgba(8,8,8, 0.6) 60%, transparent 100%); }
             .pdf-image { 
                 mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
                 -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
@@ -107,22 +97,22 @@
         <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" alt="Taksim Point" class="h-8 object-contain">
         
         <div class="flex items-center gap-2">
-            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-[var(--white-gold)] hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
+            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </button>
 
-            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-[var(--white-gold)] hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
+            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
             </button>
             
-            <select x-model="currentBranch" @change="updateBranchData()" class="bg-[var(--card-bg)] text-[var(--white-gold)] border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
+            <select x-model="currentBranch" @change="updateBranchData()" class="bg-[var(--card-bg)] text-brand-gold border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
                 <option value="alshati" x-text="t('branch_alshati')"></option>
                 <option value="almanar" x-text="t('branch_almanar')"></option>
                 <option value="aljawhara" x-text="t('branch_aljawhara')"></option>
                 <option value="alqunfudhah" x-text="t('branch_alqunfudhah')"></option>
             </select>
 
-            <select x-model="currentLang" @change="changeLanguage()" class="bg-[var(--card-bg)] text-[var(--white-gold)] border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
+            <select x-model="currentLang" @change="changeLanguage()" class="bg-[var(--card-bg)] text-brand-gold border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
                 <template x-for="(url, code) in langLinks" :key="code">
                     <option :value="code" x-text="langNames[code]"></option>
                 </template>
@@ -132,7 +122,7 @@
 
     <div x-show="showSearchModal" x-transition.opacity x-cloak class="fixed inset-0 z-[250] bg-[var(--bg-main)] flex flex-col" style="background-image: var(--marble-img);">
         <div class="flex items-center gap-3 p-4 glass-nav">
-            <button @click="showSearchModal = false; searchQuery = ''" class="text-[var(--white-gold)] p-2 rounded-full transition">
+            <button @click="showSearchModal = false; searchQuery = ''" class="text-brand-gold p-2 rounded-full transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <input type="text" x-model="searchQuery" :placeholder="t('search_placeholder')" class="flex-1 theme-card rounded-lg px-4 py-2.5 text-[var(--text-main)] text-sm outline-none focus:border-[var(--white-gold)] font-bold">
@@ -140,34 +130,34 @@
         
         <div class="flex-1 overflow-y-auto p-5 pb-32">
             <div x-show="searchQuery.trim() === ''" x-transition>
-                <h3 class="text-[var(--white-gold)] text-xs font-black mb-5 uppercase tracking-widest" x-text="t('browse_folders')"></h3>
+                <h3 class="text-brand-gold text-xs font-black mb-5 uppercase tracking-widest" x-text="t('browse_folders')"></h3>
                 <div class="grid grid-cols-3 gap-3">
                     <template x-for="cat in normalCategories" :key="cat">
                         <button @click="showSearchModal = false; scrollToCat(cat)" class="theme-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition">
                             <span class="text-3xl drop-shadow" x-text="getCatEmoji(cat)"></span>
-                            <span class="text-[10px] font-bold text-center leading-tight royal-text-gradient" x-text="cat"></span>
+                            <span class="text-[10px] font-bold text-center leading-tight text-brand-gold" x-text="cat"></span>
                         </button>
                     </template>
                 </div>
             </div>
 
             <div x-show="searchQuery.trim() !== ''" x-transition>
-                <h3 class="text-[var(--white-gold)] text-xs font-black mb-5 uppercase tracking-widest" x-text="t('search_results')"></h3>
+                <h3 class="text-brand-gold text-xs font-black mb-5 uppercase tracking-widest" x-text="t('search_results')"></h3>
                 <div class="flex flex-col gap-3">
                     <template x-for="item in searchResults" :key="item.id">
                         <div class="theme-card rounded-xl p-3 flex gap-3 items-center">
                             <img :src="item.image" class="w-16 h-16 rounded-lg object-cover">
                             <div class="flex-1">
-                                <h4 class="text-sm font-bold line-clamp-1 royal-text-gradient" x-text="item.name"></h4>
-                                <p class="text-[10px] text-[var(--white-gold)] mb-1 font-bold opacity-80" x-text="item.category"></p>
-                                <span class="font-black text-xs text-[var(--white-gold)]" x-text="item.price + ' SR'"></span>
+                                <h4 class="text-sm font-bold line-clamp-1 text-brand-gold" x-text="item.name"></h4>
+                                <p class="text-[10px] text-brand-gold mb-1 font-bold opacity-80" x-text="item.category"></p>
+                                <span class="font-black text-xs text-brand-gold" x-text="item.price + ' SR'"></span>
                             </div>
                             <button @click="toggleLike(item)" class="p-3 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition">
                                 <span x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
                             </button>
                         </div>
                     </template>
-                    <div x-show="searchResults.length === 0" class="text-center text-[var(--white-gold)] text-sm mt-10 font-bold opacity-50" x-text="t('no_results')"></div>
+                    <div x-show="searchResults.length === 0" class="text-center text-brand-gold text-sm mt-10 font-bold opacity-50" x-text="t('no_results')"></div>
                 </div>
             </div>
         </div>
@@ -176,12 +166,12 @@
     <div x-show="showQRModal" x-cloak class="fixed inset-0 z-[200] bg-black/90 flex flex-col items-center justify-center p-6 backdrop-blur-md">
         <button @click="showQRModal = false" class="absolute top-6 right-6 text-white text-3xl font-black">✕</button>
         <div class="theme-card border-[var(--border-color)] p-8 rounded-2xl flex flex-col items-center shadow-[0_0_40px_rgba(232,217,182,0.1)]">
-            <h2 class="font-black text-xl mb-1 text-center royal-text-gradient" x-text="t('branch_' + currentBranch)"></h2>
-            <p class="text-[var(--white-gold)] opacity-70 text-xs mb-6 text-center font-bold">قم بمسح الباركود للوصول السريع</p>
+            <h2 class="font-black text-xl mb-1 text-center text-brand-gold" x-text="t('branch_' + currentBranch)"></h2>
+            <p class="text-brand-gold opacity-70 text-xs mb-6 text-center font-bold">قم بمسح الباركود للوصول السريع</p>
             <div class="bg-white p-3 rounded-xl mb-6">
                 <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(getBranchUrl())" class="w-48 h-48">
             </div>
-            <button @click="copyBranchUrl()" class="w-full bg-gradient-to-r from-[var(--white-gold)] to-[#B38728] text-black font-black py-3 rounded-lg flex items-center justify-center gap-2 transition active:scale-95">
+            <button @click="copyBranchUrl()" class="w-full bg-[var(--white-gold)] text-black font-black py-3 rounded-lg flex items-center justify-center gap-2 transition active:scale-95">
                 <span>🔗</span> نسخ رابط الفرع
             </button>
         </div>
@@ -189,7 +179,7 @@
 
     <div x-show="isLoading" class="fixed inset-0 z-[200] bg-[var(--bg-main)] flex flex-col items-center justify-center" style="background-image: var(--marble-img);">
         <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mb-6 animate-pulse drop-shadow-[0_0_15px_rgba(232,217,182,0.3)]">
-        <div class="text-[var(--white-gold)] text-sm font-black tracking-widest uppercase">Taksim Point...</div>
+        <div class="text-brand-gold text-sm font-black tracking-widest uppercase">Taksim Point...</div>
     </div>
 
     <div x-show="hasError" x-cloak class="fixed inset-0 z-[300] bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
@@ -201,9 +191,9 @@
     <div x-show="view === 'home' && !isLoading && !hasError" x-transition.opacity.duration.500ms class="pb-32 pt-24">
         <section class="px-6 mb-12 text-center">
             <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mx-auto mb-6 object-contain drop-shadow-2xl">
-            <h1 class="text-2xl font-black mb-4 text-center royal-text-gradient" x-text="t('about_title')"></h1>
-            <p class="text-sm glow-gold leading-relaxed text-justify px-2 mb-4 font-semibold" x-text="t('about_p1')"></p>
-            <p class="text-sm glow-gold leading-relaxed text-justify px-2 font-semibold" x-text="t('about_p2')"></p>
+            <h1 class="text-2xl font-black mb-4 text-center text-brand-gold" x-text="t('about_title')"></h1>
+            <p class="text-sm text-brand-gold opacity-90 leading-relaxed text-justify px-2 mb-4 font-semibold" x-text="t('about_p1')"></p>
+            <p class="text-sm text-brand-gold opacity-90 leading-relaxed text-justify px-2 font-semibold" x-text="t('about_p2')"></p>
         </section>
 
         <section class="relative h-[35vh] w-full mb-12 px-4">
@@ -212,11 +202,11 @@
                     <div class="slide relative h-full theme-card rounded-xl overflow-hidden" :id="'hero-slide-' + index">
                         <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-5">
-                            <h2 class="text-2xl font-black mb-1 drop-shadow-lg royal-text-gradient" x-text="item.name"></h2>
-                            <p class="glow-gold text-xs line-clamp-2 mb-3 font-bold" x-text="item.description"></p>
+                            <h2 class="text-2xl font-black mb-1 drop-shadow-lg text-brand-gold" x-text="item.name"></h2>
+                            <p class="text-brand-gold opacity-80 text-xs line-clamp-2 mb-3 font-bold" x-text="item.description"></p>
                             <div class="flex justify-between items-center">
-                                <span class="text-xl font-black text-[var(--white-gold)] drop-shadow" x-text="item.price + ' SR'"></span>
-                                <button @click="scrollToCat(item.category)" class="bg-gradient-to-r from-[var(--white-gold)] to-[#B38728] text-black px-4 py-1.5 text-xs font-black rounded shadow-lg">الطلب ➔</button>
+                                <span class="text-xl font-black text-brand-gold drop-shadow" x-text="item.price + ' SR'"></span>
+                                <button @click="scrollToCat(item.category)" class="bg-[var(--white-gold)] text-black px-4 py-1.5 text-xs font-black rounded shadow-lg">الطلب ➔</button>
                             </div>
                         </div>
                     </div>
@@ -225,13 +215,13 @@
         </section>
 
         <section class="px-5 mb-10">
-            <h3 class="text-lg font-black mb-6 text-center uppercase tracking-widest royal-text-gradient" x-text="t('nav_menu')"></h3>
+            <h3 class="text-lg font-black mb-6 text-center uppercase tracking-widest text-brand-gold" x-text="t('nav_menu')"></h3>
             <div class="grid grid-cols-2 gap-3">
                 <template x-for="cat in normalCategories" :key="cat">
                     <button @click="scrollToCat(cat)" class="cat-box theme-card relative h-28 rounded-xl overflow-hidden flex items-center justify-center group border border-[var(--border-color)]">
                         <img :src="getCategoryBg(cat)" loading="lazy" class="absolute inset-0 w-full h-full category-silhouette">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20"></div>
-                        <span class="relative z-10 font-black text-sm text-center px-1 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] royal-text-gradient" x-text="cat"></span>
+                        <span class="relative z-10 font-black text-sm text-center px-1 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-brand-gold" x-text="cat"></span>
                     </button>
                 </template>
             </div>
@@ -243,7 +233,7 @@
         <div class="fixed top-[65px] left-0 w-full z-40 transition-transform duration-300" :class="showCatBar ? 'translate-y-0' : '-translate-y-full'">
             <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 py-2 glass-nav border-b border-[var(--border-color)] shadow-md">
                 <template x-for="cat in normalCategories" :key="cat">
-                    <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-[var(--white-gold)] opacity-70 hover:opacity-100 transition" x-text="cat"></button>
+                    <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-brand-gold opacity-70 hover:opacity-100 transition" x-text="cat"></button>
                 </template>
             </div>
         </div>
@@ -259,13 +249,13 @@
                     <div class="absolute inset-y-0 left-0 w-[85%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
                         
                         <div class="mb-8 border-r-4 border-[var(--white-gold)] pr-4 drop-shadow-[0_2px_15px_rgba(0,0,0,1)]">
-                            <h2 class="text-3xl md:text-5xl pdf-title-ar mb-1 royal-text-gradient" x-text="cat"></h2>
-                            <h3 class="text-xs md:text-sm pdf-title-en text-[var(--white-gold)] opacity-70 uppercase tracking-widest" x-text="getEnglishCat(cat)"></h3>
+                            <h2 class="text-3xl md:text-5xl pdf-title-ar mb-1 text-brand-gold" x-text="cat"></h2>
+                            <h3 class="text-xs md:text-sm pdf-title-en text-brand-gold opacity-70 uppercase tracking-widest" x-text="getEnglishCat(cat)"></h3>
                         </div>
                         
                         <div x-show="isIntro(cat) && getCatItems(cat).length === 0" class="drop-shadow-md">
-                            <p class="text-xs md:text-sm leading-loose mb-4 font-bold glow-gold" x-text="t('about_p1')"></p>
-                            <p class="text-xs md:text-sm leading-loose font-bold glow-gold" x-text="t('about_p2')"></p>
+                            <p class="text-xs md:text-sm leading-loose mb-4 font-bold text-brand-gold" x-text="t('about_p1')"></p>
+                            <p class="text-xs md:text-sm leading-loose font-bold text-brand-gold" x-text="t('about_p2')"></p>
                         </div>
 
                         <div class="flex flex-col gap-6 pb-20">
@@ -273,13 +263,13 @@
                                 <div class="flex flex-col relative group theme-card rounded-lg p-3 border border-[var(--border-color)]/50 backdrop-blur-sm">
                                     
                                     <div class="flex items-end w-full mb-1.5 gap-1">
-                                        <h4 class="font-bold text-sm md:text-base leading-tight whitespace-normal max-w-[70%] royal-text-gradient" x-text="item.name"></h4>
+                                        <h4 class="font-bold text-sm md:text-base leading-tight whitespace-normal max-w-[70%] text-brand-gold" x-text="item.name"></h4>
                                         <div class="flex-1 border-b-2 border-dotted border-[var(--white-gold)]/40 relative top-[-4px] min-w-[10px]"></div>
-                                        <span class="text-[var(--white-gold)] font-black text-sm md:text-base whitespace-nowrap" x-text="item.price + ' SR'"></span>
+                                        <span class="text-brand-gold font-black text-sm md:text-base whitespace-nowrap" x-text="item.price + ' SR'"></span>
                                     </div>
                                     
                                     <div class="flex justify-between items-start gap-2">
-                                        <p class="text-[11px] md:text-xs glow-gold leading-relaxed font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
+                                        <p class="text-[11px] md:text-xs text-brand-gold opacity-80 leading-relaxed font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
                                         
                                         <div class="flex items-center gap-2">
                                             <button @click="toggleLike(item)" class="p-1 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
@@ -287,7 +277,7 @@
                                             </button>
                                             <div x-show="isLiked(item.id)" class="flex items-center gap-2 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-1.5 py-0.5 shadow-lg" x-transition>
                                                 <button @click="updateQty(item.id, -1)" class="text-[var(--white-gold)] text-sm font-black px-1 hover:scale-110">-</button>
-                                                <span class="text-[10px] font-black text-[var(--text-main)] w-3 text-center" x-text="quantities[item.id] || 1"></span>
+                                                <span class="text-[10px] font-black text-brand-gold w-3 text-center" x-text="quantities[item.id] || 1"></span>
                                                 <button @click="updateQty(item.id, 1)" class="text-[var(--white-gold)] text-sm font-black px-1 hover:scale-110">+</button>
                                             </div>
                                         </div>
@@ -309,8 +299,8 @@
                 <template x-if="item.isSocial">
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] z-50">
                         <img :src="item.image" class="h-28 mb-8 drop-shadow-[0_0_20px_rgba(232,217,182,0.2)]">
-                        <h2 class="text-3xl font-black mb-4 text-center royal-text-gradient" x-text="item.name"></h2>
-                        <p class="glow-gold text-center mb-10 text-sm leading-relaxed font-bold" x-text="item.description"></p>
+                        <h2 class="text-3xl font-black mb-4 text-center text-brand-gold" x-text="item.name"></h2>
+                        <p class="text-brand-gold opacity-90 text-center mb-10 text-sm leading-relaxed font-bold" x-text="item.description"></p>
                         <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
                             <a href="https://www.tiktok.com/@taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">🎵</span><span class="text-xs font-bold text-[var(--white-gold)]">TikTok</span></a>
                             <a href="https://www.instagram.com/taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">📸</span><span class="text-xs font-bold text-[var(--white-gold)]">Instagram</span></a>
@@ -332,10 +322,10 @@
                             <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
                         </template>
                         
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32 pointer-events-none">
+                        <div x-show="!item.isDrive" class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32 pointer-events-none">
                             <span class="bg-red-600/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2 uppercase" x-text="t('nav_explore')"></span>
-                            <h2 class="text-3xl font-black mb-2 drop-shadow-xl royal-text-gradient" x-text="item.name"></h2>
-                            <p class="glow-gold text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3 font-bold" x-text="item.description"></p>
+                            <h2 class="text-3xl font-black mb-2 drop-shadow-xl text-brand-gold" x-text="item.name"></h2>
+                            <p class="text-brand-gold opacity-90 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3 font-bold" x-text="item.description"></p>
                             <template x-if="item.price"><span class="text-2xl font-black text-[var(--white-gold)] drop-shadow-lg" x-text="item.price + ' SR'"></span></template>
                             
                             <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center pointer-events-auto">
@@ -356,7 +346,7 @@
     </div>
 
     <div x-show="view === 'likes'" x-transition x-cloak class="min-h-screen pt-20 pb-32 px-4">
-        <h2 class="text-2xl font-black text-center mb-8 uppercase royal-text-gradient" x-text="t('nav_likes')"></h2>
+        <h2 class="text-2xl font-black text-center mb-8 uppercase text-brand-gold" x-text="t('nav_likes')"></h2>
         <div x-show="likes.length === 0" class="text-center mt-20 text-[var(--white-gold)] opacity-70 font-black" x-text="t('empty_likes')"></div>
 
         <div class="flex flex-col gap-4 mb-10">
@@ -364,13 +354,13 @@
                 <div class="theme-card p-3 flex flex-col gap-3 rounded-xl border border-[var(--border-color)] shadow-sm">
                     <div class="flex justify-between items-center">
                         <div class="flex-1 px-2">
-                            <h4 class="font-black text-sm royal-text-gradient" x-text="item.name"></h4>
+                            <h4 class="font-black text-sm text-brand-gold" x-text="item.name"></h4>
                             <span class="text-[var(--white-gold)] text-xs font-black" x-text="item.price + ' SR'"></span>
                         </div>
                         <button @click="toggleLike(item)" class="text-red-500 bg-red-500/10 px-3 py-2 rounded text-xs font-bold border border-red-500/20 active:scale-95 transition">حذف</button>
                     </div>
                     <div class="flex justify-between items-center px-2 pt-2 border-t border-[var(--border-color)]">
-                        <span class="text-xs glow-gold font-black">الكمية:</span>
+                        <span class="text-xs text-brand-gold opacity-90 font-black">الكمية:</span>
                         <div class="flex items-center gap-4 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-3 py-1">
                             <button @click="updateQty(item.id, -1)" class="text-lg font-black text-[var(--white-gold)] hover:scale-110 transition">-</button>
                             <span class="font-black text-sm w-4 text-center text-[var(--text-main)]" x-text="quantities[item.id] || 1"></span>
@@ -381,14 +371,14 @@
             </template>
         </div>
 
-        <button x-show="likes.length > 0" @click="showInvoiceModal = true" class="w-full bg-gradient-to-r from-[var(--white-gold)] to-[#B38728] text-black font-black py-4 rounded-xl text-lg shadow-[0_0_20px_rgba(232,217,182,0.2)] active:scale-95 transition tracking-wider" x-text="t('show_invoice')"></button>
+        <button x-show="likes.length > 0" @click="showInvoiceModal = true" class="w-full bg-[var(--white-gold)] text-black font-black py-4 rounded-xl text-lg shadow-[0_0_20px_rgba(232,217,182,0.2)] active:scale-95 transition tracking-wider" x-text="t('show_invoice')"></button>
     </div>
 
     <div x-show="showInvoiceModal" x-transition x-cloak class="fixed inset-0 z-[300] bg-black/80 flex flex-col items-center justify-center p-4 backdrop-blur-md">
         <div class="theme-card w-full max-w-md rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(232,217,182,0.1)] relative border border-[var(--border-color)] flex flex-col max-h-[85vh]">
             <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="watermark">
             <div class="p-5 border-b border-[var(--border-color)] flex justify-between items-center relative z-10 glass-nav">
-                <h2 class="font-black text-xl royal-text-gradient" x-text="t('invoice_title')"></h2>
+                <h2 class="font-black text-xl text-brand-gold" x-text="t('invoice_title')"></h2>
                 <button @click="showInvoiceModal = false" class="text-[var(--white-gold)] opacity-70 text-2xl hover:text-red-500 transition">✕</button>
             </div>
             <div class="p-5 overflow-y-auto relative z-10 flex-1">
@@ -396,7 +386,7 @@
                     <div class="flex justify-between items-center border-b border-[var(--border-color)] border-dashed py-3 last:border-0">
                         <div class="flex-1 pr-2">
                             <h4 class="font-black text-sm text-[var(--text-main)]" x-text="item.name"></h4>
-                            <div class="flex gap-2 text-[10px] glow-gold mt-1 font-bold">
+                            <div class="flex gap-2 text-[10px] text-brand-gold opacity-80 mt-1 font-bold">
                                 <span x-text="'الكمية: ' + (quantities[item.id] || 1)"></span>
                                 <span x-show="item.calories">|</span>
                                 <span x-show="item.calories" x-text="item.calories + ' Kcal'"></span>
@@ -407,7 +397,7 @@
                 </template>
             </div>
             <div class="p-4 bg-[var(--section-bg)] border-t border-[var(--border-color)] relative z-10 text-center">
-                <p class="text-xs font-black glow-gold" x-text="t('waiter_note')"></p>
+                <p class="text-xs font-black text-brand-gold" x-text="t('waiter_note')"></p>
             </div>
         </div>
     </div>
