@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" x-data="taksimApp()" :class="theme === 'light' ? 'light-theme' : ''">
+<html lang="ar" dir="rtl" x-data="taksimApp()" class="dark-theme">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Taksim Point | المنيو الرقمي</title>
+    <title>Taksim Point | المنيو الرقمي الفاخر</title>
     
     <link rel="icon" type="image/png" href="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png">
     
@@ -11,42 +11,28 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Montserrat:wght@400;600;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --gold: #D4AF37; 
+            --white-gold: #F5E6CA; /* لون الذهب الأبيض الدافئ الجديد المستوحى من الصورة */
             --bg-main: #0a0a0a; 
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --card-bg: rgba(18, 18, 18, 0.8);
             --section-bg: #0c0c0c;
-            --border-color: rgba(212, 175, 55, 0.2);
-            --glass-nav: rgba(10, 10, 10, 0.95);
+            --border-color: rgba(245, 230, 202, 0.25); /* إطارات بلون الذهب الأبيض */
+            --glass-nav: rgba(10, 10, 10, 0.96);
             --marble-img: url('https://www.transparenttextures.com/patterns/black-mamba.png');
             --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
             
-            /* تدرج الجوال: صلب جداً في اليسار، ثم شفاف سريعاً لإظهار 80% من الأكل */
-            --pdf-gradient: linear-gradient(to right, var(--bg-main) 5%, rgba(10, 10, 10, 0.85) 30%, rgba(10, 10, 10, 0.3) 60%, transparent 100%);
-        }
-        
-        .light-theme {
-            --bg-main: #fcfcfc;
-            --text-main: #111111;
-            --text-muted: #4b5563;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --section-bg: #f4f4f4;
-            --border-color: rgba(212, 175, 55, 0.4);
-            --glass-nav: rgba(255, 255, 255, 0.98);
-            --marble-img: url('https://www.transparenttextures.com/patterns/white-marble.png');
-            --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 60%);
-            
-            /* تدرج الجوال للوضع النهاري */
-            --pdf-gradient: linear-gradient(to right, var(--bg-main) 5%, rgba(252, 252, 252, 0.85) 30%, rgba(252, 252, 252, 0.3) 60%, transparent 100%);
+            /* تدرج الـ PDF للوضع الليلي المعتمد (صلب يسار، شفاف يمين) */
+            --pdf-gradient: linear-gradient(to right, var(--bg-main) 30%, rgba(10, 10, 10, 0.85) 60%, transparent 100%);
         }
         
         body { 
-            font-family: 'Tajawal', sans-serif; /* تفعيل الخط الفاخر */
+            font-family: 'Montserrat', 'Cairo', sans-serif; /* الخطوط الأساسية */
             background-color: var(--bg-main); 
             background-image: var(--gold-glow), var(--marble-img);
             background-attachment: fixed;
@@ -60,7 +46,11 @@
         [x-cloak] { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        .glass-nav { background: var(--glass-nav); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        /* كلاسات العناوين الفاخرة للـ PDF */
+        .pdf-title-ar { font-family: 'Cairo', sans-serif; font-weight: 900; }
+        .pdf-title-en { font-family: 'Cinzel Decorative', serif; font-weight: 700; letter-spacing: 2px; }
+        
+        .glass-nav { background: var(--glass-nav); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
         .gold-gradient { background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
@@ -74,7 +64,7 @@
         .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s; object-fit: cover; object-position: center; }
         .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
 
-        /* ==== هندسة أبعاد صورة الـ PDF ==== */
+        /* ==== هندسة أبعاد صورة الـ PDF الثابتة ==== */
         .pdf-image {
             position: absolute; 
             inset: 0; 
@@ -83,8 +73,8 @@
             object-fit: cover; 
             object-position: right center; /* الأكل مثبت باليمين دائماً */
             z-index: 0;
-            opacity: 0.95;
-            /* في الجوال: إظهار الصورة بنسبة 80% */
+            opacity: 0.98;
+            /* قناع القص لضمان بقاء 80% من الأكل واضح في الجوال */
             mask-image: linear-gradient(to right, transparent 0%, black 20%);
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
         }
@@ -94,10 +84,10 @@
             inset: 0; 
             z-index: 10; 
             pointer-events: none;
-            background: var(--pdf-gradient); /* يسحب من التدرج المخصص فوق */
+            background: var(--pdf-gradient); /* يسحب من التدرج المخصص في الـ Root */
         }
         
-        /* تعديلات شاشات الكمبيوتر للحفاظ على جمالها */
+        /* تعديلات شاشات الكمبيوتر للحفاظ على الأبعاد الأصلية */
         @media (min-width: 768px) {
             .pdf-overlay { background: linear-gradient(to right, var(--bg-main) 40%, rgba(10, 10, 10, 0.5) 60%, transparent 100%); }
             .pdf-image { 
@@ -113,10 +103,6 @@
         <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" alt="Taksim Point" class="h-8 object-contain">
         
         <div class="flex items-center gap-2">
-            <button @click="toggleTheme()" class="p-1.5 border border-[var(--border-color)] rounded text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition">
-                <span x-show="theme === 'dark'">☀️</span><span x-show="theme === 'light'">🌙</span>
-            </button>
-
             <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </button>
@@ -129,6 +115,7 @@
                 <option value="alshati" x-text="t('branch_alshati')"></option>
                 <option value="almanar" x-text="t('branch_almanar')"></option>
                 <option value="aljawhara" x-text="t('branch_aljawhara')"></option>
+                <option value="alqunfudhah" x-text="t('branch_alqunfudhah')"></option>
             </select>
 
             <select x-model="currentLang" @change="changeLanguage()" class="bg-[var(--card-bg)] text-[#D4AF37] border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded">
@@ -265,30 +252,30 @@
                     
                     <div class="pdf-overlay"></div>
                     
-                    <div class="absolute inset-y-0 left-0 w-[75%] md:w-[50%] z-20 p-4 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
+                    <div class="absolute inset-y-0 left-0 w-[80%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
                         
-                        <h2 class="text-2xl md:text-5xl font-black mb-6 text-[#D4AF37] drop-shadow-[0_2px_15px_rgba(0,0,0,1)] flex items-center gap-3">
-                            <span class="w-1.5 h-8 bg-[#D4AF37] rounded-full shadow-lg"></span>
-                            <span x-text="cat" class="text-[var(--text-main)]"></span>
-                        </h2>
+                        <div class="mb-8 border-r-4 border-[#D4AF37] pr-4 drop-shadow-[0_2px_15px_rgba(0,0,0,1)]">
+                            <h2 class="text-3xl md:text-5xl pdf-title-ar text-[var(--text-main)] mb-1" x-text="cat"></h2>
+                            <h3 class="text-xs md:text-sm pdf-title-en text-[#D4AF37] uppercase tracking-widest" x-text="getEnglishCat(cat)"></h3>
+                        </div>
                         
                         <div x-show="isIntro(cat) && getCatItems(cat).length === 0" class="text-[var(--text-main)] drop-shadow-md">
                             <p class="text-xs md:text-sm leading-loose mb-4 font-bold" x-text="t('about_p1')"></p>
                             <p class="text-xs md:text-sm leading-loose font-bold" x-text="t('about_p2')"></p>
                         </div>
 
-                        <div class="flex flex-col gap-5 pb-20">
+                        <div class="flex flex-col gap-6 pb-20">
                             <template x-for="item in getCatItems(cat)" :key="item.id">
-                                <div class="flex flex-col relative group">
+                                <div class="flex flex-col relative group theme-card rounded-lg p-3 border border-[var(--border-color)]/50 backdrop-blur-sm">
                                     
-                                    <div class="flex items-end w-full mb-1 gap-1">
-                                        <h4 class="font-black text-[var(--text-main)] text-[11px] md:text-base drop-shadow-md leading-tight whitespace-normal max-w-[70%]" x-text="item.name"></h4>
-                                        <div class="flex-1 border-b-2 border-dotted border-[var(--border-color)] relative top-[-4px] opacity-70 min-w-[10px]"></div>
-                                        <span class="text-[#D4AF37] font-black text-[11px] md:text-base drop-shadow-md whitespace-nowrap" x-text="item.price + ' SR'"></span>
+                                    <div class="flex items-end w-full mb-1.5 gap-1">
+                                        <h4 class="font-bold text-[var(--text-main)] text-sm md:text-base leading-tight whitespace-normal max-w-[70%]" x-text="item.name"></h4>
+                                        <div class="flex-1 border-b-2 border-dotted border-[var(--white-gold)]/40 relative top-[-4px] min-w-[10px]"></div>
+                                        <span class="text-[#D4AF37] font-black text-sm md:text-base whitespace-nowrap" x-text="item.price + ' SR'"></span>
                                     </div>
                                     
                                     <div class="flex justify-between items-start gap-2">
-                                        <p class="text-[9px] md:text-xs text-[var(--text-muted)] leading-relaxed font-bold line-clamp-2 w-[80%]" x-text="item.description"></p>
+                                        <p class="text-[10px] md:text-xs text-[var(--text-muted)] leading-relaxed font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
                                         
                                         <div class="flex items-center gap-2">
                                             <button @click="toggleLike(item)" class="p-1 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
@@ -348,8 +335,8 @@
                                         <span class="text-3xl" x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
                                     </button>
                                 </template>
-                                <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
-                                    <span class="text-2xl">🔗</span>
+                                <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur p-3 rounded-full border border-white/20 active:scale-75 transition">
+                                    <span class="text-lg">🔗</span>
                                 </button>
                             </div>
                         </div>
@@ -444,25 +431,29 @@
         function taksimApp() {
             return {
                 isLoading: true, hasError: false, view: 'home', currentLang: 'ar', currentBranch: 'alshati',
-                theme: localStorage.getItem('taksim_theme') || 'dark',
+                theme: localStorage.getItem('taksim_theme') || 'dark', // الافتراضي دائماً ليلي
                 showQRModal: false, showSearchModal: false, showInvoiceModal: false, searchQuery: '',        
                 showCatBar: true, lastScroll: 0,
                 
                 allRawData: [], activeMenuItems: [], activeExploreItems: [], heroOffers: [], heroIdx: 0, heroInterval: null, syncInterval: null,
                 
                 globalImages: {}, categoryBgs: {}, emptyBgCategories: [], likes: [], quantities: {}, 
-                targetHeroIds: ['TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-174', 'TP-175'],
+                // إضافة TP-116 للواجهة
+                targetHeroIds: ['TP-116', 'TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-174', 'TP-175'],
 
                 uiDict: {
                     ar: {
                         about_title: "من تقسيم بوينت،،،،",
-                        about_p1: "يعد مطعم تقسيم بوينت من أجود المطاعم التي تقدم أفضل جودة للمأكولات والمشويات التركية والعالمية والتي تتناسب مع جميع افراد المجتمع ويتميز تقسيم بوينت ايضا بالسعر المناسب بجانب الجودة والطعم اللذيذ. ويتميز مطعم تقسيم بوينت باللحوم الطازجة ١٠٠٪ التي تخضع لعناية خاصة من مزارعنا.",
+                        about_p1: "يعد مطعم تقسيم بوينت من أجود المطاعم التي تقدم أفضل جودة للمأكولات والمشويات التركية والعالمية والتي تتناسب مع جميع افراد المجتمع ويتميز تقسيم بوينت ايضا بالسعر المناسب بجانب الجودة والطعم اللذيذ. ويتميز مطعم تقسيم بوينت باللحوم الطازجة ١٠٪ التي تخضع لعناية خاصة من مزارعنا.",
                         about_p2: "ومن هذا المنطلق جعلنا من أهم مهامنا هو تقديم أفضل خدمة وأفضل جودة لجميع العملاء بلا استثناء حيث اننا نمتلك طاقماً مميزاً في جميع اقسام المطعم (المطبخ والاستقبال والضيافة والنظافة). ويطمح تقسيم بوينت الى ان يصبح من أهم المطاعم في المملكة العربية السعودية وفي العالم.",
                         nav_home: "الرئيسية", nav_menu: "الأصناف", nav_explore: "استكشاف", nav_likes: "طلباتي",
                         branch_alshati: "الواجهة", branch_almanar: "المنار", branch_aljawhara: "الجوهرة",
+                        branch_alqunfudhah: "القنفذة", // ترجمة القنفذة
                         show_invoice: "🧾 إظهار كفاتورة", invoice_title: "فاتورة الطلب", waiter_note: "يرجى عرض هذه القائمة للنادل لخدمتك ✨",
                         empty_likes: "سلتك فارغة. اضغط على القلب لإضافة أصناف!",
-                        search_placeholder: "ابحث عن طبق، برجر، عصير...", browse_folders: "تصفح المجلدات", search_results: "نتائج البحث", no_results: "لا توجد نتائج مطابقة لبحثك"
+                        search_placeholder: "ابحث عن طبق، برجر، عصير...", browse_folders: "تصفح المجلدات", search_results: "نتائج البحث", no_results: "لا توجد نتائج مطابقة لبحثك",
+                        vid_mix_grill: "حصرياً في فرعنا بالقنفذة عرض مكس جريل",
+                        vid_best_steak: "افضل ستيك"
                     },
                     en: {
                         about_title: "From Taksim Point,,,,",
@@ -470,9 +461,12 @@
                         about_p2: "From this standpoint, our primary mission is to provide the best service and quality to all customers. We have an outstanding team across all restaurant departments. Taksim Point aspires to become one of the most prominent restaurants globally.",
                         nav_home: "Home", nav_menu: "Menu", nav_explore: "Explore", nav_likes: "My Order",
                         branch_alshati: "Waterfront", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara",
+                        branch_alqunfudhah: "Al Qunfudhah",
                         show_invoice: "🧾 Show Receipt", invoice_title: "Order Receipt", waiter_note: "Please show this list to the waiter to serve you ✨",
                         empty_likes: "No items selected.",
-                        search_placeholder: "Search for a dish, burger, juice...", browse_folders: "Browse Folders", search_results: "Search Results", no_results: "No matching results found"
+                        search_placeholder: "Search for a dish, burger, juice...", browse_folders: "Browse Folders", search_results: "Search Results", no_results: "No matching results found",
+                        vid_mix_grill: "Exclusive at Al Qunfudhah Branch: Mix Grill Offer",
+                        vid_best_steak: "BEST STEAK"
                     },
                     tr: {
                         about_title: "Taksim Point'ten,,,,",
@@ -480,9 +474,12 @@
                         about_p2: "Bu vizyonla en önemli görevimiz tüm müşterilerimize en iyi hizmeti sunmaktır. Taksim Point, dünyadaki en önemli restoranlardan biri olmayı hedeflemektedir.",
                         nav_home: "Ana Sayfa", nav_menu: "Menü", nav_explore: "Keşfet", nav_likes: "Siparişlerim",
                         branch_alshati: "Sahil", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara",
+                        branch_alqunfudhah: "Al Qunfudhah",
                         show_invoice: "🧾 Fişi Göster", invoice_title: "Sipariş Fişi", waiter_note: "Size hizmet edebilmemiz için lütfen bu listeyi garsona gösterin ✨",
                         empty_likes: "Sipariş bulunamadı.",
-                        search_placeholder: "Yemek, burger, meyve suyu ara...", browse_folders: "Klasörlere Göz At", search_results: "Arama Sonuçları", no_results: "Eşleşen sonuç bulunamadı"
+                        search_placeholder: "Yemek, burger, meyve suyu ara...", browse_folders: "Klasörlere Göz At", search_results: "Arama Sonuçları", no_results: "Eşleşen sonuç bulunamadı",
+                        vid_mix_grill: "Exclusive at Al Qunfudhah Branch: Mix Grill Offer",
+                        vid_best_steak: "BEST STEAK"
                     }
                 },
 
@@ -509,10 +506,8 @@
                 get isRTL() { return ['ar', 'ur', 'fa', 'he'].includes(this.currentLang); },
                 t(key) { const dict = this.uiDict[this.currentLang] || this.uiDict['en']; return dict[key] || this.uiDict['ar'][key] || key; },
 
-                toggleTheme() {
-                    this.theme = this.theme === 'dark' ? 'light' : 'dark';
-                    localStorage.setItem('taksim_theme', this.theme);
-                },
+                // تم حذف تبديل المظهر النهاري
+                toggleTheme() {},
 
                 handleScroll() {
                     const currentY = window.pageYOffset;
@@ -532,14 +527,17 @@
                     }
                 },
 
+                // جلب الصور المركزية من الملف العربي وضبط عمود القنفذة
                 async fetchGlobalImages() {
                     try {
                         const res = await fetch(this.langLinks['ar'] + '&t=' + Date.now());
+                        if(!res.ok) return;
                         const text = await res.text();
                         Papa.parse(text, {
                             header: false, skipEmptyLines: true,
                             complete: (results) => {
                                 results.data.slice(1).forEach(cols => {
+                                    if(cols.length < 7) return;
                                     let id = (cols[0] || '').trim();
                                     let img = (cols[6] || '').trim();
                                     if(id && img) this.globalImages[id] = img;
@@ -564,6 +562,7 @@
                                 this.emptyBgCategories = [];
 
                                 let parsedData = rows.map(cols => {
+                                    if(cols.length < 2) return null;
                                     let id = (cols[0] || '').trim();
                                     let cat = (cols[1] || '').trim();
                                     let numId = parseInt(id.replace('TP-', ''));
@@ -578,9 +577,12 @@
                                         price: (cols[3] || '').trim(), calories: (cols[4] || '').trim(),
                                         description: (cols[5] || '').replace(/\r?\n|\r/g, ' ').trim(),
                                         image: (cols[6] || '').trim() || this.globalImages[id] || '', 
-                                        almanar: (cols[7] || '').trim(), aljawhara: (cols[8] || '').trim(), alshati: (cols[9] || '').trim()
+                                        almanar: cols.length > 7 ? (cols[7] || '').trim() : '', 
+                                        aljawhara: cols.length > 8 ? (cols[8] || '').trim() : '', 
+                                        alshati: cols.length > 9 ? (cols[9] || '').trim() : '',
+                                        alqunfudhah: cols.length > 10 ? (cols[10] || '').trim() : '' // العمود رقم 11 للتوفر في القنفذة
                                     }
-                                }).filter(i => i.id && i.id.startsWith('TP-'));
+                                }).filter(i => i && i.id && i.id.startsWith('TP-'));
 
                                 if (parsedData.length === 0) throw new Error('No Data');
                                 this.allRawData = parsedData;
@@ -596,6 +598,7 @@
                         if (this.currentBranch === 'almanar' && item.almanar === 'غير متوفر') return false;
                         if (this.currentBranch === 'aljawhara' && item.aljawhara === 'غير متوفر') return false;
                         if (this.currentBranch === 'alshati' && item.alshati === 'غير متوفر') return false;
+                        if (this.currentBranch === 'alqunfudhah' && item.alqunfudhah === 'غير متوفر') return false; // فحص التوفر في القنفذة
                         return true;
                     });
 
@@ -606,11 +609,22 @@
 
                     this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
 
-                    let dbExploreItems = availableItems.filter(i => ['الاستكشاف', 'Explore', 'Keşfet'].includes(i.category));
-                    const customVideo = { id: 'custom-vid-1', name: 'أجواء تقسيم بوينت', description: 'شاهد الفخامة والمذاق الأصيل في أروقة مطاعمنا.', price: '', image: 'https://drive.google.com/uc?export=download&id=1AbI4yPT8MqLWciJrts2SY66UYkwmmRQm', category: 'استكشاف', isVideo: true, custom: true };
-                    const socialCard = { id: 'social-card-1', name: 'تابعونا على المنصات', description: 'كن على إطلاع دائم بآخر العروض والأطباق الجديدة من تقسيم بوينت.', image: 'https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png', isSocial: true, custom: true };
+                    // تحديث الاستكشافات بالفيديوهات الجديدة وروابط البث المباشر
+                    const directVids = [
+                        // فيديو مكس جريل حصرياً للقنفذة (روابط البث من جوجل درايف باستخدام uc?id)
+                        { id: 'vid-mixgrill-qunf', name: this.t('vid_mix_grill'), description: '', price: '', image: 'https://drive.google.com/uc?export=download&id=1kFM5-1vGfELfGN35UspAHndg4IJdOtBL', category: 'استكشاف', isVideo: true, custom: true, exclusiveBranch: 'alqunfudhah' },
+                        // فيديو أفضل ستيك
+                        { id: 'vid-beststeak', name: this.t('vid_best_steak'), description: '', price: '', image: 'https://drive.google.com/uc?export=download&id=11HoXmfaU1QxLnqsPY0EsPHB66WqZxB55', category: 'استكشاف', isVideo: true, custom: true }
+                    ];
 
-                    this.activeExploreItems = [customVideo, ...dbExploreItems, socialCard];
+                    let dbExploreItems = availableItems.filter(i => ['الاستكشاف', 'Explore', 'Keşfet'].includes(i.category));
+                    const socialCard = { id: 'social-card-1', name: 'تابعونا على المنصات', description: 'كن على إطلاع دائم بآخر العروض.', image: 'https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png', isSocial: true, custom: true };
+
+                    // دمج وفلترة الفيديوهات الحصرية
+                    this.activeExploreItems = [...directVids, ...dbExploreItems, socialCard].filter(item => {
+                        if (item.exclusiveBranch && item.exclusiveBranch !== this.currentBranch) return false;
+                        return true;
+                    });
 
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?branch=' + this.currentBranch;
                     window.history.replaceState({path:newUrl}, '', newUrl);
@@ -682,6 +696,12 @@
                     return '🍽️';
                 },
 
+                // دالة لجلب اسم القسم الإنجليزي (تجريبياً، يمكن استبدالها بقراءة من عمود مخصص في الشيت)
+                getEnglishCat(cat) {
+                    const map = { 'المقدمة': 'Introduction', 'مشويات': 'Grills', 'برجر': 'Burgers', 'بيتزا': 'Pizza', 'مقبلات': 'Appetizers', 'مشروبات': 'Drinks', 'حلويات': 'Desserts' };
+                    return map[cat] || 'Taksim Menu';
+                },
+
                 getCategoryBg(catName) { return this.categoryBgs[catName] || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800'; },
                 getBranchUrl() { return window.location.origin + window.location.pathname + '?branch=' + this.currentBranch; },
                 copyBranchUrl() { navigator.clipboard.writeText(this.getBranchUrl()).then(() => alert('تم نسخ رابط الفرع!')); },
@@ -730,35 +750,33 @@
                 isLiked(id) { return this.likes.includes(id); },
 
                 shareExplore(id) {
-                    const url = window.location.origin + window.location.pathname + '?branch=' + this.currentBranch + '&explore=' + id;
-                    if (navigator.share) navigator.share({ title: 'استكشف هذا من تقسيم بوينت', url: url });
+                    const url = window.location.origin + window.location.pathname + '?view=explore&branch=' + this.currentBranch + '&explore=' + id;
+                    if (navigator.share) navigator.share({ title: 'تقسيم بوينت | استكشف', url: url });
                     else { navigator.clipboard.writeText(url); alert('تم نسخ الرابط!'); }
-                },
-
-                copyOrder() {
-                    let text = "طلبي من تقسيم بوينت (" + this.t('branch_'+this.currentBranch) + "):\n\n";
-                    this.likedItemsList.forEach(item => text += `- ${item.name} | ${item.price} SR\n`);
-                    navigator.clipboard.writeText(text).then(() => alert('تم النسخ بنجاح!'));
                 },
 
                 async initApp() { 
                     this.initLocalStorage(); 
                     
                     const urlParams = new URLSearchParams(window.location.search);
-                    const allowedBranches = ['alshati', 'almanar', 'aljawhara'];
+                    const allowedBranches = ['alshati', 'almanar', 'aljawhara', 'alqunfudhah'];
                     let b = urlParams.get('branch');
                     if(b && allowedBranches.includes(b)) this.currentBranch = b; 
                     
                     await this.fetchGlobalImages();
                     await this.changeLanguage(); 
                     
+                    // التعامل مع روابط المشاركة للقسم الاستكشافي
+                    let sharedView = urlParams.get('view');
                     const exploreId = urlParams.get('explore');
-                    if(exploreId) {
+                    if(exploreId || sharedView === 'explore') {
                         this.view = 'explore';
-                        setTimeout(() => {
-                            const el = document.getElementById('explore-' + exploreId);
-                            if(el) el.scrollIntoView({ behavior: 'auto' });
-                        }, 1000);
+                        if(exploreId) {
+                            setTimeout(() => {
+                                const el = document.getElementById('explore-' + exploreId);
+                                if(el) el.scrollIntoView({ behavior: 'auto' });
+                            }, 1000);
+                        }
                     }
 
                     this.startBackgroundSync();
