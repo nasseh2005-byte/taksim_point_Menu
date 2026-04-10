@@ -14,17 +14,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* المتغيرات الديناميكية (الوضع الليلي الفاخر مع رخام واضح) */
+        /* المتغيرات الديناميكية (الوضع الليلي) */
         :root { 
             --gold: #D4AF37; 
-            --bg-main: #0a0a0a; /* تفتيح درجة الأسود قليلاً لإبراز الرخام */
+            --bg-main: #0a0a0a; 
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --card-bg: rgba(18, 18, 18, 0.8);
             --section-bg: #0c0c0c;
             --border-color: rgba(212, 175, 55, 0.2);
             --glass-nav: rgba(10, 10, 10, 0.85);
-            /* صورة رخام عالية الدقة وواضحة العروق */
             --marble-img: url('https://www.transparenttextures.com/patterns/black-mamba.png');
             --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
         }
@@ -45,7 +44,6 @@
         body { 
             font-family: 'Cairo', sans-serif; 
             background-color: var(--bg-main); 
-            /* دمج الرخام والإضاءة مع تقليل التعتيم لظهور النقوش */
             background-image: var(--gold-glow), var(--marble-img);
             background-attachment: fixed;
             background-size: cover, auto;
@@ -67,13 +65,25 @@
         .tiktok-container { height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .tiktok-item { height: 100dvh; scroll-snap-align: start; position: relative; }
         
-        .category-bg-blend { position: absolute; inset: 0; z-index: 0; opacity: 0.3; mask-image: linear-gradient(to bottom, black 30%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%); object-fit: cover; object-position: center; width: 100%; height: 100%; }
-        
-        .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); object-fit: cover; object-position: center; }
-        .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
-
         .theme-card { background-color: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.1); transition: all 0.3s; }
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; width: 80%; pointer-events: none; z-index: 0; }
+
+        /* تصميم المربعات المختصرة للرئيسية */
+        .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s; object-fit: cover; object-position: center; }
+        .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
+
+        /* ==== تصميم الـ PDF (المجلة الذكية) ==== */
+        .pdf-overlay {
+            position: absolute;
+            top: 0; bottom: 0; left: 0;
+            width: 88%; /* يأخذ 88% من الشاشة لليسار على الجوال */
+            background: linear-gradient(to right, var(--bg-main) 70%, transparent 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+        @media (min-width: 768px) {
+            .pdf-overlay { width: 55%; background: linear-gradient(to right, var(--bg-main) 60%, transparent 100%); }
+        }
     </style>
 </head>
 <body class="overflow-x-hidden relative" :dir="isRTL ? 'rtl' : 'ltr'" x-init="initApp()">
@@ -170,6 +180,13 @@
         <div class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase">Taksim Point...</div>
     </div>
 
+    <div x-show="hasError" x-cloak class="fixed inset-0 z-[300] bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
+        <span class="text-red-500 text-5xl mb-4">⚠️</span>
+        <h2 class="text-xl font-bold text-[var(--text-main)] mb-2">عذراً، حدث خطأ في جلب القائمة</h2>
+        <p class="text-[var(--text-muted)] text-sm mb-6">يرجى التأكد من اتصالك بالإنترنت والمحاولة مجدداً.</p>
+        <button @click="window.location.reload()" class="bg-[#D4AF37] text-black px-6 py-2 rounded-full font-bold">تحديث الصفحة</button>
+    </div>
+
     <div x-show="view === 'home' && !isLoading && !hasError" x-transition.opacity.duration.500ms class="pb-32 pt-24">
         
         <section class="px-6 mb-12 text-center">
@@ -212,7 +229,7 @@
     </div>
 
     <div x-show="view === 'menu' && !hasError" x-cloak class="min-h-screen pt-20 pb-32">
-        <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 mb-4 pb-2 border-b border-[var(--border-color)] sticky top-[76px] z-40 glass-nav">
+        <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 mb-6 pb-2 border-b border-[var(--border-color)] sticky top-[76px] z-40 glass-nav">
             <template x-for="cat in normalCategories" :key="cat">
                 <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-[var(--text-muted)] hover:text-[#D4AF37] transition" x-text="cat"></button>
             </template>
@@ -220,27 +237,47 @@
 
         <div class="px-4">
             <template x-for="cat in normalCategories" :key="cat">
-                <div class="mb-12 relative rounded-2xl overflow-hidden theme-card scroll-mt-[130px] shadow-lg" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
-                    <img :src="getCategoryBg(cat)" loading="lazy" class="category-bg-blend">
+                
+                <div class="mb-16 relative rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.4)] border border-[var(--border-color)] scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
                     
-                    <div class="relative z-10 p-5">
-                        <h2 class="text-2xl font-black mb-6 drop-shadow-lg flex items-center gap-3">
-                            <span class="w-1.5 h-6 bg-[#D4AF37]"></span>
+                    <img :src="getCategoryBg(cat)" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center z-0">
+                    
+                    <div class="pdf-overlay"></div>
+                    
+                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[55%] z-20 p-6 md:p-10 flex flex-col overflow-y-auto no-scrollbar" :dir="isRTL ? 'rtl' : 'ltr'">
+                        
+                        <h2 class="text-3xl md:text-4xl font-black mb-8 text-[#D4AF37] drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] flex items-center gap-3">
+                            <span class="w-1.5 h-10 bg-[#D4AF37] rounded-full shadow-lg"></span>
                             <span x-text="cat" class="text-[var(--text-main)]"></span>
                         </h2>
                         
-                        <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-6 pb-20">
                             <template x-for="item in activeMenuItems.filter(i => i.category === cat)" :key="item.id">
-                                <div class="flex justify-between items-start border-b border-[var(--border-color)] pb-4 last:border-0">
-                                    <div class="flex-1 pr-4">
-                                        <h4 class="font-bold text-[var(--text-main)] text-sm mb-1 drop-shadow" x-text="item.name"></h4>
-                                        <p class="text-[11px] text-[var(--text-muted)] leading-relaxed mb-2 w-full font-medium" x-text="item.description"></p>
-                                        <span class="text-[#D4AF37] font-black text-sm" x-text="item.price + ' SR'"></span>
+                                
+                                <div class="flex flex-col gap-2 border-b border-[var(--border-color)] pb-4 last:border-0 relative">
+                                    <div class="flex justify-between items-start gap-4">
+                                        <div class="flex-1">
+                                            <h4 class="font-black text-[var(--text-main)] text-sm md:text-base drop-shadow-md" x-text="item.name"></h4>
+                                            <p class="text-[10px] md:text-xs text-[var(--text-muted)] leading-relaxed mt-1 font-semibold line-clamp-3" x-text="item.description"></p>
+                                        </div>
+                                        <div class="text-left whitespace-nowrap">
+                                            <span class="text-[#D4AF37] font-black text-sm md:text-base drop-shadow-md" x-text="item.price + ' SR'"></span>
+                                        </div>
                                     </div>
-                                    <button @click="toggleLike(item)" class="p-3 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition flex-shrink-0">
-                                        <span x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
-                                    </button>
+                                    
+                                    <div class="flex items-center gap-3 mt-1">
+                                        <button @click="toggleLike(item)" class="p-2 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
+                                            <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-xs"></span>
+                                        </button>
+                                        
+                                        <div x-show="isLiked(item.id)" class="flex items-center gap-3 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-2 py-1 shadow-lg" x-transition>
+                                            <button @click="updateQty(item.id, -1)" class="text-[#D4AF37] text-sm font-bold px-1 hover:scale-110">-</button>
+                                            <span class="text-xs font-bold text-[var(--text-main)] w-3 text-center" x-text="quantities[item.id] || 1"></span>
+                                            <button @click="updateQty(item.id, 1)" class="text-[#D4AF37] text-sm font-bold px-1 hover:scale-110">+</button>
+                                        </div>
+                                    </div>
                                 </div>
+                                
                             </template>
                         </div>
                     </div>
@@ -252,11 +289,13 @@
     <div x-show="view === 'explore' && !hasError" x-cloak class="tiktok-container relative bg-black">
         <template x-for="item in activeExploreItems" :key="item.id">
             <div class="tiktok-item" :id="'explore-' + item.id">
+                
                 <template x-if="item.isSocial">
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] z-50">
                         <img :src="item.image" class="h-28 mb-8 drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]">
                         <h2 class="text-3xl font-black text-[#D4AF37] mb-4 text-center" x-text="item.name"></h2>
                         <p class="text-gray-300 text-center mb-10 text-sm leading-relaxed" x-text="item.description"></p>
+                        
                         <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
                             <a href="https://www.tiktok.com/@taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition"><span class="text-2xl">🎵</span><span class="text-xs font-bold text-white">TikTok</span></a>
                             <a href="https://www.instagram.com/taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[#D4AF37] transition"><span class="text-2xl">📸</span><span class="text-xs font-bold text-white">Instagram</span></a>
@@ -265,6 +304,7 @@
                         </div>
                     </div>
                 </template>
+
                 <template x-if="!item.isSocial">
                     <div class="w-full h-full relative">
                         <template x-if="item.isVideo || isVideo(item.image)">
@@ -273,11 +313,13 @@
                         <template x-if="!item.isVideo && !isVideo(item.image)">
                             <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
                         </template>
+                        
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32">
                             <span class="bg-red-600/80 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2 uppercase" x-text="t('nav_explore')"></span>
                             <h2 class="text-3xl font-black mb-2 text-white drop-shadow-xl" x-text="item.name"></h2>
                             <p class="text-gray-200 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3" x-text="item.description"></p>
                             <template x-if="item.price"><span class="text-2xl font-black text-[#D4AF37] drop-shadow-lg" x-text="item.price + ' SR'"></span></template>
+                            
                             <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center">
                                 <template x-if="!item.custom">
                                     <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
@@ -399,31 +441,6 @@
                 heroInterval: null,
                 syncInterval: null,
                 
-                hardcodedCategoryImages: {
-                    'TP-280': 'https://cdn.phototourl.com/free/2026-04-06-3733ce3c-98f1-468c-b546-0a760efadfb4.png',
-                    'TP-281': 'https://cdn.phototourl.com/free/2026-04-06-f989270f-bb00-4e3f-a5e8-39e299f2d567.png',
-                    'TP-282': 'https://cdn.phototourl.com/free/2026-04-06-5ace665d-db21-486a-91fd-d54d5f207e39.png',
-                    'TP-283': 'https://cdn.phototourl.com/free/2026-04-06-2a935872-3653-4ba7-a1f0-b2990b5451f7.png',
-                    'TP-284': 'https://cdn.phototourl.com/free/2026-04-06-820b7c2f-2cc5-4e72-93c0-64f6988cb3cd.png',
-                    'TP-285': 'https://cdn.phototourl.com/member/2026-04-06-5ead7e5d-9de6-45f7-9bf8-39f2db46ee8d.png',
-                    'TP-286': 'https://cdn.phototourl.com/member/2026-04-06-ecd46992-c928-417f-84c1-b642b162e8ae.png',
-                    'TP-287': 'https://cdn.phototourl.com/member/2026-04-06-402eb5e5-b124-4360-8b8a-303d1ff36669.png',
-                    'TP-288': 'https://cdn.phototourl.com/member/2026-04-06-54fa98e0-5886-433b-9cf1-adae30f16ead.png',
-                    'TP-289': 'https://cdn.phototourl.com/member/2026-04-06-38b8abf9-8d60-45ed-9e75-46e9e4b82a46.png',
-                    'TP-290': 'https://cdn.phototourl.com/member/2026-04-06-923f654d-e28d-4e62-85f4-49d2016cd7cd.png',
-                    'TP-291': 'https://cdn.phototourl.com/member/2026-04-06-d8501444-5ad3-4010-bae6-6962c0f0a9c9.png',
-                    'TP-292': 'https://cdn.phototourl.com/member/2026-04-06-9c9f2a5f-d786-41e4-9854-76b0050cb1a9.png',
-                    'TP-293': 'https://cdn.phototourl.com/member/2026-04-06-8c5d633f-7e56-4cc3-b1eb-4b26fc5315df.png',
-                    'TP-294': 'https://cdn.phototourl.com/member/2026-04-06-148386ed-4d0a-44be-bc52-df73bc6259cb.png',
-                    'TP-295': 'https://cdn.phototourl.com/free/2026-04-06-9a8bebbc-6b8c-40b6-ac90-666f87829ddc.png',
-                    'TP-296': 'https://cdn.phototourl.com/free/2026-04-06-058c2676-dc96-40c3-bc6c-8eb96096aa68.png',
-                    'TP-297': 'https://cdn.phototourl.com/free/2026-04-06-8ae64d50-457d-451e-bdaf-e074c133cd05.png',
-                    'TP-298': 'https://cdn.phototourl.com/free/2026-04-06-7637e387-a54c-485b-8914-203b58bb1ef9.png',
-                    'TP-299': 'https://cdn.phototourl.com/free/2026-04-06-51d37c77-23f8-4847-b2f2-cdb1bc707567.png',
-                    'TP-300': 'https://cdn.phototourl.com/free/2026-04-06-f37307f5-d1d2-4d41-94f6-0f68af1a35ef.png',
-                    'TP-301': 'https://cdn.phototourl.com/free/2026-04-06-6a009df7-7912-44f6-a612-fa37d7d52be4.png',
-                    'TP-302': 'https://cdn.phototourl.com/free/2026-04-06-b87b57ad-cf30-4db9-922a-152326481f5c.png'
-                },
                 categoryBgs: {}, 
                 
                 likes: [],
@@ -531,10 +548,12 @@
 
                                 this.allRawData = parsedData;
 
+                                // سحب خلفيات الأقسام ديناميكياً (تم توسيع النطاق ليدعم 30+ صفحة)
                                 this.categoryBgs = {};
                                 parsedData.forEach(item => {
-                                    if(this.hardcodedCategoryImages[item.id]) {
-                                        this.categoryBgs[item.category] = this.hardcodedCategoryImages[item.id];
+                                    const numId = parseInt(item.id.replace('TP-', ''));
+                                    if(numId >= 280 && numId <= 350 && item.category && item.image) {
+                                        this.categoryBgs[item.category] = item.image;
                                     }
                                 });
 
@@ -555,7 +574,7 @@
 
                     this.activeMenuItems = availableItems.filter(item => {
                         const numId = parseInt(item.id.replace('TP-', ''));
-                        return (numId < 280 || numId > 302) && !['الاستكشاف', 'Explore', 'Keşfet'].includes(item.category);
+                        return (numId < 280 || numId > 350) && !['الاستكشاف', 'Explore', 'Keşfet'].includes(item.category);
                     });
 
                     this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
@@ -566,7 +585,6 @@
 
                     this.activeExploreItems = [customVideo, ...dbExploreItems, socialCard];
 
-                    // التحديث الصامت للرابط بناء على الفرع لحماية المشاركة
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?branch=' + this.currentBranch;
                     window.history.replaceState({path:newUrl}, '', newUrl);
 
@@ -584,7 +602,6 @@
                     );
                 },
 
-                // التمرير الأفقي المحمي (بدون قفز للصفحة)
                 startAutoScroll() {
                     if(this.heroInterval) clearInterval(this.heroInterval);
                     this.heroInterval = setInterval(() => {
@@ -592,7 +609,7 @@
                         if (slider) {
                             const slideWidth = slider.clientWidth;
                             if (slider.scrollLeft + slideWidth >= slider.scrollWidth - 10) {
-                                slider.scrollTo({ left: 0, behavior: 'smooth' }); // الرجوع للأول
+                                slider.scrollTo({ left: 0, behavior: 'smooth' }); 
                             } else {
                                 slider.scrollBy({ left: this.isRTL ? -slideWidth : slideWidth, behavior: 'smooth' });
                             }
@@ -608,22 +625,16 @@
                 get normalCategories() { return [...new Set(this.activeMenuItems.map(i => i.category))].filter(c => c !== ''); },
                 getCategoryBg(catName) { return this.categoryBgs[catName] || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800'; },
                 
-                // جلب الرابط النظيف (يحذف أي بارامترات استضافة إضافية)
-                getBranchUrl() { 
-                    return window.location.origin + window.location.pathname + '?branch=' + this.currentBranch; 
-                },
+                getBranchUrl() { return window.location.origin + window.location.pathname + '?branch=' + this.currentBranch; },
                 copyBranchUrl() { navigator.clipboard.writeText(this.getBranchUrl()).then(() => alert('تم نسخ رابط الفرع!')); },
-
-                isVideo(url) { return url && (url.match(/\.(mp4|webm|ogg)$/i) || url.includes('video') || url.includes('drive.google')); },
 
                 scrollToCat(cat) {
                     this.view = 'menu';
-                    this.showSearchModal = false; // إغلاق نافذة البحث إن كانت مفتوحة
+                    this.showSearchModal = false; 
                     const safeCatId = btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '');
                     setTimeout(() => {
                         const el = document.getElementById('cat-' + safeCatId);
                         if(el) {
-                            // التمرير لمكان دقيق يعلو القسم بـ 120px ليظهر تحت الناف بار
                             const y = el.getBoundingClientRect().top + window.pageYOffset - 120;
                             window.scrollTo({top: y, behavior: 'smooth'});
                         }
@@ -660,12 +671,6 @@
 
                 isLiked(id) { return this.likes.includes(id); },
 
-                shareExplore(id) {
-                    const url = window.location.origin + window.location.pathname + '?branch=' + this.currentBranch + '&explore=' + id;
-                    if (navigator.share) navigator.share({ title: 'استكشف هذا من تقسيم بوينت', url: url });
-                    else { navigator.clipboard.writeText(url); alert('تم نسخ الرابط!'); }
-                },
-
                 initApp() { 
                     this.initLocalStorage(); 
                     
@@ -674,16 +679,6 @@
                     let b = urlParams.get('branch');
                     if(b && allowedBranches.includes(b)) this.currentBranch = b; 
                     
-                    // كشف الاستكشاف بعد تهيئة البيانات
-                    const exploreId = urlParams.get('explore');
-                    if(exploreId) {
-                        this.view = 'explore';
-                        setTimeout(() => {
-                            const el = document.getElementById('explore-' + exploreId);
-                            if(el) el.scrollIntoView({ behavior: 'auto' });
-                        }, 1000);
-                    }
-
                     this.changeLanguage(); 
                     this.startBackgroundSync();
                 }
