@@ -67,20 +67,33 @@
         .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s; object-fit: cover; object-position: center; }
         .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
 
-        /* تصميم المنيو الورقي الذكي */
+        /* ==== تصميم الـ PDF (المحاذاة الجديدة) ==== */
+        /* التدرج اللوني الذي يغطي الصورة تحت النص (يمثل المنطقة الحمراء في رسمك) */
         .pdf-overlay {
             position: absolute; inset: 0; z-index: 10; pointer-events: none;
-            background: linear-gradient(to right, var(--bg-main) 75%, transparent 100%);
-        }
-        .category-bg-blend { 
-            position: absolute; inset: 0; z-index: 0; opacity: 0.5; 
-            object-fit: cover; object-position: center; /* في الجوال تكون بالمنتصف تماماً */
-            mask-image: linear-gradient(to bottom, black 40%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            /* تغطية قوية من اليسار، شفافة من اليمين */
+            background: linear-gradient(to right, var(--bg-main) 50%, rgba(var(--bg-main), 0.8) 70%, transparent 100%);
         }
         
+        /* إزاحة الصورة لليمين وإعطائها شفافية مدرجة */
+        .category-bg-blend { 
+            position: absolute; inset: 0; z-index: 0; opacity: 0.75; 
+            /* إزاحة الصورة بحيث يظهر الجانب الأيمن منها (المنطقة الخضراء) */
+            object-position: 80% center; 
+            object-fit: cover;
+            /* قناع يخفي الـ 25% اليسرى من الصورة تقريباً (المنطقة الحمراء) */
+            mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
+        }
+        
+        /* تعديلات شاشات الكمبيوتر */
         @media (min-width: 768px) {
-            .pdf-overlay { background: linear-gradient(to right, var(--bg-main) 60%, transparent 100%); }
-            .category-bg-blend { object-position: right center; opacity: 0.8; } /* في الكمبيوتر تنزاح لليمين */
+            .pdf-overlay { background: linear-gradient(to right, var(--bg-main) 40%, rgba(var(--bg-main), 0.5) 60%, transparent 100%); }
+            .category-bg-blend { 
+                object-position: right center; opacity: 0.9; 
+                mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 70%);
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 30%, black 70%);
+            }
         }
     </style>
 </head>
@@ -238,11 +251,11 @@
             <template x-for="cat in normalCategories" :key="cat">
                 <div class="mb-16 relative rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.5)] border border-[var(--border-color)] scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
                     
-                    <img :src="getCategoryBg(cat)" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center md:object-right z-0">
+                    <img :src="getCategoryBg(cat)" loading="lazy" class="category-bg-blend">
                     
                     <div class="pdf-overlay"></div>
                     
-                    <div class="absolute inset-y-0 w-[90%] md:w-[60%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" :class="isRTL ? 'right-0' : 'left-0'">
+                    <div class="absolute inset-y-0 w-[85%] md:w-[65%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" :class="isRTL ? 'right-0' : 'left-0'">
                         
                         <h2 class="text-3xl md:text-5xl font-black mb-8 text-[#D4AF37] drop-shadow-[0_2px_15px_rgba(0,0,0,1)] flex items-center gap-3">
                             <span class="w-2 h-10 bg-[#D4AF37] rounded-full shadow-lg"></span>
@@ -266,11 +279,15 @@
                                     
                                     <div class="flex justify-between items-start gap-2">
                                         <p class="text-[10px] md:text-xs text-[var(--text-muted)] leading-relaxed font-semibold line-clamp-2 w-[80%]" x-text="item.description"></p>
-                                        
                                         <div class="flex items-center gap-2">
                                             <button @click="toggleLike(item)" class="p-1.5 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
                                                 <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-[10px]"></span>
                                             </button>
+                                            <div x-show="isLiked(item.id)" class="flex items-center gap-3 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-2 py-1 shadow-lg" x-transition>
+                                                <button @click="updateQty(item.id, -1)" class="text-[#D4AF37] text-sm font-bold px-1 hover:scale-110">-</button>
+                                                <span class="text-xs font-bold text-[var(--text-main)] w-3 text-center" x-text="quantities[item.id] || 1"></span>
+                                                <button @click="updateQty(item.id, 1)" class="text-[#D4AF37] text-sm font-bold px-1 hover:scale-110">+</button>
+                                            </div>
                                         </div>
                                     </div>
                                     
@@ -286,6 +303,7 @@
     <div x-show="view === 'explore' && !hasError" x-cloak class="tiktok-container relative bg-black">
         <template x-for="item in activeExploreItems" :key="item.id">
             <div class="tiktok-item" :id="'explore-' + item.id">
+                
                 <template x-if="item.isSocial">
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] z-50">
                         <img :src="item.image" class="h-28 mb-8 drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]">
@@ -416,7 +434,6 @@
             return {
                 isLoading: true, hasError: false, view: 'home', currentLang: 'ar', currentBranch: 'alshati',
                 theme: localStorage.getItem('taksim_theme') || 'dark',
-                
                 showQRModal: false, showSearchModal: false, showInvoiceModal: false, searchQuery: '',        
                 showCatBar: true, lastScroll: 0,
                 
@@ -504,6 +521,7 @@
                     }
                 },
 
+                // سحب صور جميع اللغات من الملف العربي (نظام الذاكرة المركزية)
                 async fetchGlobalImages() {
                     try {
                         const res = await fetch(this.langLinks['ar'] + '&t=' + Date.now());
@@ -540,7 +558,7 @@
                                     let cat = (cols[1] || '').trim();
                                     let numId = parseInt(id.replace('TP-', ''));
                                     
-                                    // إذا كان العنصر عبارة عن خلفية قسم (من 250 إلى 400)
+                                    // النطاق الجديد للبحث عن صور الأقسام
                                     if(numId >= 250 && numId <= 400 && cat) {
                                         this.categoryBgs[cat] = (cols[6] || '').trim() || this.globalImages[id] || '';
                                         this.emptyBgCategories.push(cat);
@@ -640,6 +658,7 @@
                     return this.activeMenuItems.filter(i => i.category === cat);
                 },
 
+                // تحديد إذا كان هذا القسم هو المقدمة
                 isIntro(cat) {
                     return ['مقدم', 'intro', 'giriş'].some(k => cat.toLowerCase().includes(k));
                 },
@@ -708,6 +727,12 @@
 
                 isLiked(id) { return this.likes.includes(id); },
 
+                shareExplore(id) {
+                    const url = window.location.origin + window.location.pathname + '?branch=' + this.currentBranch + '&explore=' + id;
+                    if (navigator.share) navigator.share({ title: 'استكشف هذا من تقسيم بوينت', url: url });
+                    else { navigator.clipboard.writeText(url); alert('تم نسخ الرابط!'); }
+                },
+
                 async initApp() { 
                     this.initLocalStorage(); 
                     
@@ -716,8 +741,19 @@
                     let b = urlParams.get('branch');
                     if(b && allowedBranches.includes(b)) this.currentBranch = b; 
                     
+                    // سحب الصور المركزية قبل تحميل اللغة الحالية
                     await this.fetchGlobalImages();
                     await this.changeLanguage(); 
+                    
+                    const exploreId = urlParams.get('explore');
+                    if(exploreId) {
+                        this.view = 'explore';
+                        setTimeout(() => {
+                            const el = document.getElementById('explore-' + exploreId);
+                            if(el) el.scrollIntoView({ behavior: 'auto' });
+                        }, 1000);
+                    }
+
                     this.startBackgroundSync();
                 }
             }
