@@ -16,17 +16,16 @@
     <style>
         :root { 
             --gold: #D4AF37; 
-            --white-gold: #e8d9b6; /* اللون الذهبي المبيض الذي طلبته */
-            --bg-main: #0a0a0a; 
+            --white-gold: #e8d9b6; 
+            --bg-main: #080808; /* أسود عميق لإبراز النصوص */
             --text-main: #ffffff;
-            --text-muted: #9ca3af;
+            --text-muted: #d1d5db; /* تفتيح الوصف ليكون مقروءاً في الجوال */
             --card-bg: rgba(18, 18, 18, 0.8);
             --section-bg: #0c0c0c;
             --border-color: rgba(232, 217, 182, 0.25); 
             --glass-nav: rgba(10, 10, 10, 0.96);
             --marble-img: url('https://www.transparenttextures.com/patterns/black-mamba.png');
             --gold-glow: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
-            --pdf-gradient: linear-gradient(to right, var(--bg-main) 30%, rgba(10, 10, 10, 0.85) 60%, transparent 100%);
         }
         
         body { 
@@ -43,9 +42,9 @@
         [x-cloak] { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* التدرج اللوني الجديد للخطوط (أبيض -> ذهبي مبيض -> ذهبي غامق) */
+        /* التدرج اللوني المحسن ليصبح أكثر سطوعاً في الجوال */
         .royal-text-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, var(--white-gold) 50%, #9a7b2c 100%);
+            background: linear-gradient(135deg, #ffffff 10%, var(--white-gold) 60%, #af8a26 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
@@ -68,6 +67,7 @@
         .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s; object-fit: cover; object-position: center; }
         .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
 
+        /* ==== أبعاد الـ PDF ==== */
         .pdf-image {
             position: absolute; inset: 0; width: 100%; height: 100%; 
             object-fit: cover; object-position: right center; 
@@ -76,17 +76,20 @@
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
         }
         
-        .pdf-overlay { position: absolute; inset: 0; z-index: 10; pointer-events: none; background: var(--pdf-gradient); }
+        /* التدرج الداكن لتوضيح النصوص في الجوال (صلب إلى 55% ثم يتلاشى) */
+        .pdf-overlay { 
+            position: absolute; inset: 0; z-index: 10; pointer-events: none; 
+            background: linear-gradient(to right, var(--bg-main) 50%, rgba(8, 8, 8, 0.85) 75%, transparent 100%); 
+        }
         
         @media (min-width: 768px) {
-            .pdf-overlay { background: linear-gradient(to right, var(--bg-main) 40%, rgba(10, 10, 10, 0.5) 60%, transparent 100%); }
+            .pdf-overlay { background: linear-gradient(to right, var(--bg-main) 40%, rgba(8, 8, 8, 0.6) 60%, transparent 100%); }
             .pdf-image { 
                 mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
                 -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
             }
         }
         
-        /* تخصيص الـ Iframe الخاص بجوجل درايف ليغطي الشاشة */
         .drive-iframe {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border: none; z-index: 0;
@@ -99,22 +102,22 @@
         <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" alt="Taksim Point" class="h-8 object-contain">
         
         <div class="flex items-center gap-2">
-            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-[#e8d9b6] hover:bg-[var(--white-gold)] hover:text-black transition">
+            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-[var(--white-gold)] hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </button>
 
-            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-[#e8d9b6] hover:bg-[var(--white-gold)] hover:text-black transition">
+            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-[var(--white-gold)] hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
             </button>
             
-            <select x-model="currentBranch" @change="updateBranchData()" class="bg-[var(--card-bg)] text-[var(--white-gold)] border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded">
+            <select x-model="currentBranch" @change="updateBranchData()" class="bg-[var(--card-bg)] text-[var(--white-gold)] border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
                 <option value="alshati" x-text="t('branch_alshati')"></option>
                 <option value="almanar" x-text="t('branch_almanar')"></option>
                 <option value="aljawhara" x-text="t('branch_aljawhara')"></option>
                 <option value="alqunfudhah" x-text="t('branch_alqunfudhah')"></option>
             </select>
 
-            <select x-model="currentLang" @change="changeLanguage()" class="bg-[var(--card-bg)] text-[var(--white-gold)] border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded">
+            <select x-model="currentLang" @change="changeLanguage()" class="bg-[var(--card-bg)] text-[var(--white-gold)] border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
                 <template x-for="(url, code) in langLinks" :key="code">
                     <option :value="code" x-text="langNames[code]"></option>
                 </template>
@@ -127,7 +130,7 @@
             <button @click="showSearchModal = false; searchQuery = ''" class="text-[var(--white-gold)] p-2 rounded-full transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <input type="text" x-model="searchQuery" :placeholder="t('search_placeholder')" class="flex-1 theme-card rounded-lg px-4 py-2.5 text-[var(--text-main)] text-sm outline-none focus:border-[var(--white-gold)]">
+            <input type="text" x-model="searchQuery" :placeholder="t('search_placeholder')" class="flex-1 theme-card rounded-lg px-4 py-2.5 text-[var(--text-main)] text-sm outline-none focus:border-[var(--white-gold)] font-bold">
         </div>
         
         <div class="flex-1 overflow-y-auto p-5 pb-32">
@@ -159,6 +162,7 @@
                             </button>
                         </div>
                     </template>
+                    <div x-show="searchResults.length === 0" class="text-center text-gray-500 text-sm mt-10 font-bold" x-text="t('no_results')"></div>
                 </div>
             </div>
         </div>
@@ -183,12 +187,6 @@
         <div class="text-[var(--white-gold)] text-sm font-black tracking-widest uppercase">Taksim Point...</div>
     </div>
 
-    <div x-show="hasError" x-cloak class="fixed inset-0 z-[300] bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
-        <span class="text-red-500 text-5xl mb-4">⚠️</span>
-        <h2 class="text-xl font-bold text-[var(--text-main)] mb-2">عذراً، حدث خطأ في جلب القائمة</h2>
-        <button @click="window.location.reload()" class="bg-[var(--white-gold)] text-black px-6 py-2 rounded-full font-bold mt-4">تحديث الصفحة</button>
-    </div>
-
     <div x-show="view === 'home' && !isLoading && !hasError" x-transition.opacity.duration.500ms class="pb-32 pt-24">
         <section class="px-6 mb-12 text-center">
             <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mx-auto mb-6 object-contain drop-shadow-2xl">
@@ -204,7 +202,7 @@
                         <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-5">
                             <h2 class="text-2xl font-black mb-1 drop-shadow-lg royal-text-gradient" x-text="item.name"></h2>
-                            <p class="text-gray-300 text-xs line-clamp-2 mb-3 font-bold" x-text="item.description"></p>
+                            <p class="text-[var(--text-muted)] text-xs line-clamp-2 mb-3 font-bold" x-text="item.description"></p>
                             <div class="flex justify-between items-center">
                                 <span class="text-xl font-black text-[var(--white-gold)] drop-shadow" x-text="item.price + ' SR'"></span>
                                 <button @click="scrollToCat(item.category)" class="bg-gradient-to-r from-[var(--white-gold)] to-[#B38728] text-black px-4 py-1.5 text-xs font-black rounded shadow-lg">الطلب ➔</button>
@@ -246,7 +244,7 @@
                     <img :src="getCategoryBg(cat)" loading="lazy" class="pdf-image">
                     <div class="pdf-overlay"></div>
                     
-                    <div class="absolute inset-y-0 left-0 w-[80%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
+                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
                         
                         <div class="mb-8 border-r-4 border-[var(--white-gold)] pr-4 drop-shadow-[0_2px_15px_rgba(0,0,0,1)]">
                             <h2 class="text-3xl md:text-5xl pdf-title-ar mb-1 royal-text-gradient" x-text="cat"></h2>
@@ -269,20 +267,19 @@
                                     </div>
                                     
                                     <div class="flex justify-between items-start gap-2">
-                                        <p class="text-[10px] md:text-xs text-[var(--text-muted)] leading-relaxed font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
+                                        <p class="text-[11px] md:text-xs text-[var(--text-muted)] leading-relaxed font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
                                         
                                         <div class="flex items-center gap-2">
                                             <button @click="toggleLike(item)" class="p-1 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
                                                 <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-[10px]"></span>
                                             </button>
                                             <div x-show="isLiked(item.id)" class="flex items-center gap-2 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-1.5 py-0.5 shadow-lg" x-transition>
-                                                <button @click="updateQty(item.id, -1)" class="text-[var(--white-gold)] text-sm font-black px-1 hover:scale-110">-</button>
+                                                <button @click="updateQty(item.id, -1)" class="text-[#D4AF37] text-sm font-black px-1 hover:scale-110">-</button>
                                                 <span class="text-[10px] font-black text-[var(--text-main)] w-3 text-center" x-text="quantities[item.id] || 1"></span>
-                                                <button @click="updateQty(item.id, 1)" class="text-[var(--white-gold)] text-sm font-black px-1 hover:scale-110">+</button>
+                                                <button @click="updateQty(item.id, 1)" class="text-[#D4AF37] text-sm font-black px-1 hover:scale-110">+</button>
                                             </div>
                                         </div>
                                     </div>
-                                    
                                 </div>
                             </template>
                         </div>
@@ -293,6 +290,11 @@
     </div>
 
     <div x-show="view === 'explore' && !hasError" x-cloak class="tiktok-container relative bg-black">
+        
+        <button @click="isMuted = !isMuted" class="fixed top-20 right-4 z-[160] bg-black/60 backdrop-blur-md p-3 rounded-full border border-white/20 active:scale-90 transition shadow-lg">
+            <span class="text-2xl" x-text="isMuted ? '🔇' : '🔊'"></span>
+        </button>
+
         <template x-for="item in activeExploreItems" :key="item.id">
             <div class="tiktok-item" :id="'explore-' + item.id">
                 
@@ -300,7 +302,7 @@
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] z-50">
                         <img :src="item.image" class="h-28 mb-8 drop-shadow-[0_0_20px_rgba(232,217,182,0.2)]">
                         <h2 class="text-3xl font-black mb-4 text-center royal-text-gradient" x-text="item.name"></h2>
-                        <p class="text-gray-300 text-center mb-10 text-sm leading-relaxed font-bold" x-text="item.description"></p>
+                        <p class="text-[var(--text-muted)] text-center mb-10 text-sm leading-relaxed font-bold" x-text="item.description"></p>
                         <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
                             <a href="https://www.tiktok.com/@taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">🎵</span><span class="text-xs font-bold text-white">TikTok</span></a>
                             <a href="https://www.instagram.com/taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">📸</span><span class="text-xs font-bold text-white">Instagram</span></a>
@@ -316,7 +318,7 @@
                             <iframe :src="item.image" class="drive-iframe" allow="autoplay; fullscreen"></iframe>
                         </template>
                         <template x-if="item.isVideo && !item.isDrive">
-                            <video :src="item.image" autoplay loop muted playsinline preload="metadata" class="w-full h-full object-cover object-center"></video>
+                            <video :src="item.image" autoplay loop playsinline preload="metadata" :muted="isMuted" class="w-full h-full object-cover object-center"></video>
                         </template>
                         <template x-if="!item.isVideo && !item.isDrive">
                             <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
@@ -325,7 +327,7 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32 pointer-events-none">
                             <span class="bg-red-600/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2 uppercase" x-text="t('nav_explore')"></span>
                             <h2 class="text-3xl font-black mb-2 drop-shadow-xl royal-text-gradient" x-text="item.name"></h2>
-                            <p class="text-gray-200 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3 font-bold" x-text="item.description"></p>
+                            <p class="text-[var(--text-muted)] text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3 font-bold" x-text="item.description"></p>
                             <template x-if="item.price"><span class="text-2xl font-black text-[var(--white-gold)] drop-shadow-lg" x-text="item.price + ' SR'"></span></template>
                             
                             <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center pointer-events-auto">
@@ -428,9 +430,9 @@
         function taksimApp() {
             return {
                 isLoading: true, hasError: false, view: 'home', currentLang: 'ar', currentBranch: 'alshati',
-                theme: localStorage.getItem('taksim_theme') || 'dark',
+                
                 showQRModal: false, showSearchModal: false, showInvoiceModal: false, searchQuery: '',        
-                showCatBar: true, lastScroll: 0,
+                showCatBar: true, lastScroll: 0, isMuted: true, // كتم الصوت الافتراضي
                 
                 allRawData: [], activeMenuItems: [], activeExploreItems: [], heroOffers: [], heroIdx: 0, heroInterval: null, syncInterval: null,
                 
@@ -495,10 +497,6 @@
 
                 get isRTL() { return ['ar', 'ur', 'fa', 'he'].includes(this.currentLang); },
                 t(key) { const dict = this.uiDict[this.currentLang] || this.uiDict['en']; return dict[key] || this.uiDict['ar'][key] || key; },
-
-                toggleTheme() {
-                    // تم إيقاف تغيير الوضع ليظل أسود رخامي فاخر دائماً
-                },
 
                 handleScroll() {
                     const currentY = window.pageYOffset;
@@ -570,7 +568,7 @@
                                         almanar: cols.length > 7 ? (cols[7] || '').trim() : '', 
                                         aljawhara: cols.length > 8 ? (cols[8] || '').trim() : '', 
                                         alshati: cols.length > 9 ? (cols[9] || '').trim() : '',
-                                        alqunfudhah: cols.length > 10 ? (cols[10] || '').trim() : '' // القنفذة
+                                        alqunfudhah: cols.length > 10 ? (cols[10] || '').trim() : ''
                                     }
                                 }).filter(i => i && i.id && i.id.startsWith('TP-'));
 
@@ -599,7 +597,6 @@
 
                     this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
 
-                    // الفيديوهات الذكية من جوجل درايف باستخدام Iframe
                     const vidMixGrillId = '1kFM5-1vGfELfGN35UspAHndg4IJdOtBL';
                     const vidBestSteakId = '11HoXmfaU1QxLnqsPY0EsPHB66WqZxB55';
                     
