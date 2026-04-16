@@ -21,6 +21,7 @@
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --card-bg: rgba(18, 18, 18, 0.85);
+            --section-bg: #0c0c0c;
             --border-color: rgba(232, 217, 182, 0.25); 
             --glass-nav: rgba(10, 10, 10, 0.96);
             --marble-img: url('https://www.transparenttextures.com/patterns/black-mamba.png');
@@ -49,6 +50,7 @@
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
         .slide { min-width: 100%; scroll-snap-align: center; }
         .theme-card { background-color: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.1); transition: all 0.3s; }
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; width: 80%; pointer-events: none; z-index: 0; }
         
         .pdf-image {
             position: absolute; inset: 0; width: 100%; height: 100%; 
@@ -81,11 +83,11 @@
         </div>
         
         <div class="flex items-center gap-2">
-            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition">
+            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </button>
 
-            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition">
+            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
             </button>
             
@@ -118,7 +120,39 @@
                     </template>
                 </div>
             </div>
+            <div x-show="searchQuery.trim() !== ''" x-transition>
+                <div class="flex flex-col gap-3">
+                    <template x-for="item in searchResults" :key="item.id">
+                        <div class="theme-card rounded-xl p-3 flex gap-3 items-center">
+                            <img :src="item.image" class="w-16 h-16 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <h4 class="text-sm font-bold line-clamp-1 text-brand-gold" x-text="item.name"></h4>
+                                <span class="font-black text-xs text-brand-gold" x-text="item.price + ' SR'"></span>
+                            </div>
+                            <button @click="toggleLike(item)" class="p-3 glass-nav rounded-full border border-[var(--border-color)]">
+                                <span x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div x-show="showQRModal" x-cloak class="fixed inset-0 z-[200] bg-black/90 flex flex-col items-center justify-center p-6 backdrop-blur-md">
+        <button @click="showQRModal = false" class="absolute top-6 right-6 text-white text-3xl font-black">✕</button>
+        <div class="theme-card border-[var(--border-color)] p-8 rounded-2xl flex flex-col items-center shadow-[0_0_40px_rgba(232,217,182,0.1)]">
+            <h2 class="font-black text-xl mb-1 text-center text-brand-gold">تقسيم بوينت | الواجهة البحرية</h2>
+            <div class="bg-white p-3 rounded-xl mb-6">
+                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(window.location.href)" class="w-48 h-48">
+            </div>
+            <button @click="copyBranchUrl()" class="w-full bg-gradient-to-r from-[var(--white-gold)] to-[#B38728] text-black font-black py-3 rounded-lg flex items-center justify-center gap-2 transition active:scale-95">🔗 نسخ رابط المنيو</button>
+        </div>
+    </div>
+
+    <div x-show="isLoading" class="fixed inset-0 z-[200] bg-[var(--bg-main)] flex flex-col items-center justify-center" style="background-image: var(--marble-img);">
+        <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mb-6 animate-pulse">
+        <div class="text-brand-gold text-sm font-black tracking-widest uppercase">Taksim Point Alshati...</div>
     </div>
 
     <div x-show="view === 'home' && !isLoading" class="pb-32 pt-24">
@@ -135,7 +169,10 @@
                         <img :src="item.image" loading="lazy" class="w-full h-full object-cover opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-5">
                             <h2 class="text-xl font-black mb-1 text-brand-gold" x-text="item.name"></h2>
-                            <button @click="scrollToCat(item.category)" class="bg-[var(--white-gold)] text-black px-4 py-1.5 text-[10px] font-black rounded w-max">اطلب الآن</button>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-black text-brand-gold" x-text="item.price + ' SR'"></span>
+                                <button @click="scrollToCat(item.category)" class="bg-[var(--white-gold)] text-black px-4 py-1.5 text-[10px] font-black rounded shadow-lg">اطلب الآن</button>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -150,6 +187,7 @@
         </section>
 
         <section class="px-5 mb-10">
+            <h3 class="text-lg font-black mb-6 text-center uppercase text-brand-gold" x-text="t('nav_menu')"></h3>
             <div class="grid grid-cols-2 gap-3">
                 <template x-for="cat in normalCategories" :key="cat">
                     <button @click="scrollToCat(cat)" class="cat-box theme-card relative h-28 rounded-xl overflow-hidden flex items-center justify-center border border-[var(--border-color)]">
@@ -163,10 +201,10 @@
     </div>
 
     <div x-show="view === 'menu'" class="min-h-screen pt-20 pb-32" x-cloak>
-        <div class="fixed top-[65px] left-0 w-full z-40">
+        <div class="fixed top-[65px] left-0 w-full z-40 transition-transform duration-300" :class="showCatBar ? 'translate-y-0' : '-translate-y-full'">
             <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 py-2 glass-nav border-b border-[var(--border-color)]">
                 <template x-for="cat in normalCategories" :key="cat">
-                    <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-brand-gold opacity-70" x-text="cat"></button>
+                    <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-brand-gold opacity-70 hover:opacity-100 transition" x-text="cat"></button>
                 </template>
             </div>
         </div>
@@ -176,17 +214,24 @@
                 <div class="mb-16 relative rounded-xl overflow-hidden shadow-2xl border border-[var(--border-color)] scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
                     <img :src="getCategoryBg(cat)" loading="lazy" class="pdf-image">
                     <div class="pdf-overlay"></div>
-                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col" dir="rtl">
-                        <h2 class="text-3xl md:text-5xl pdf-title-ar mb-8 text-brand-gold border-r-4 border-[var(--white-gold)] pr-4" x-text="cat"></h2>
-                        <div class="flex flex-col gap-6">
+                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
+                        <div class="mb-8 border-r-4 border-[var(--white-gold)] pr-4">
+                            <h2 class="text-3xl md:text-5xl pdf-title-ar mb-1 text-brand-gold" x-text="cat"></h2>
+                        </div>
+                        <div class="flex flex-col gap-6 pb-20">
                             <template x-for="item in getCatItems(cat)" :key="item.id">
-                                <div class="flex flex-col theme-card rounded-lg p-3 border border-[var(--border-color)]/50 backdrop-blur-sm">
+                                <div class="flex flex-col relative theme-card rounded-lg p-3 border border-[var(--border-color)]/50 backdrop-blur-sm">
                                     <div class="flex items-end w-full mb-1.5 gap-1">
-                                        <h4 class="font-bold text-sm text-brand-gold" x-text="item.name"></h4>
-                                        <div class="flex-1 border-b-2 border-dotted border-[var(--white-gold)]/40 relative top-[-4px]"></div>
-                                        <span class="text-brand-gold font-black text-sm" x-text="item.price + ' SR'"></span>
+                                        <h4 class="font-bold text-sm md:text-base leading-tight text-brand-gold max-w-[70%]" x-text="item.name"></h4>
+                                        <div class="flex-1 border-b-2 border-dotted border-[var(--white-gold)]/40 relative top-[-4px] min-w-[10px]"></div>
+                                        <span class="text-brand-gold font-black text-sm md:text-base whitespace-nowrap" x-text="item.price + ' SR'"></span>
                                     </div>
-                                    <p class="text-[11px] text-brand-gold opacity-80 font-bold" x-text="item.description"></p>
+                                    <div class="flex justify-between items-start gap-2">
+                                        <p class="text-[11px] md:text-xs text-brand-gold opacity-80 font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
+                                        <button @click="toggleLike(item)" class="p-1.5 glass-nav rounded-full border border-[var(--border-color)]">
+                                            <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-[10px]"></span>
+                                        </button>
+                                    </div>
                                 </div>
                             </template>
                         </div>
@@ -196,15 +241,70 @@
         </div>
     </div>
 
+    <div x-show="view === 'likes'" x-transition x-cloak class="min-h-screen pt-20 pb-32 px-4">
+        <h2 class="text-2xl font-black text-center mb-8 uppercase text-brand-gold" x-text="t('nav_likes')"></h2>
+        <div x-show="likes.length === 0" class="text-center mt-20 text-[var(--white-gold)] opacity-70 font-black" x-text="t('empty_likes')"></div>
+
+        <div class="flex flex-col gap-4 mb-10">
+            <template x-for="item in likedItemsList" :key="item.id">
+                <div class="theme-card p-3 flex flex-col gap-3 rounded-xl border border-[var(--border-color)]">
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1 px-2">
+                            <h4 class="font-black text-sm text-brand-gold" x-text="item.name"></h4>
+                            <span class="text-[var(--white-gold)] text-xs font-black" x-text="item.price + ' SR'"></span>
+                        </div>
+                        <button @click="toggleLike(item)" class="text-red-500 bg-red-500/10 px-3 py-2 rounded text-xs font-bold border border-red-500/20 active:scale-95 transition">حذف</button>
+                    </div>
+                    <div class="flex justify-between items-center px-2 pt-2 border-t border-[var(--border-color)]">
+                        <span class="text-xs text-[var(--text-muted)] font-black">الكمية:</span>
+                        <div class="flex items-center gap-4 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-3 py-1">
+                            <button @click="updateQty(item.id, -1)" class="text-lg font-black text-[var(--white-gold)]">-</button>
+                            <span class="font-black text-sm w-4 text-center text-[var(--text-main)]" x-text="quantities[item.id] || 1"></span>
+                            <button @click="updateQty(item.id, 1)" class="text-lg font-black text-[var(--white-gold)]">+</button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <button x-show="likes.length > 0" @click="showInvoiceModal = true" class="w-full bg-gradient-to-r from-[var(--white-gold)] to-[#B38728] text-black font-black py-4 rounded-xl text-lg shadow-xl">إظهار كفاتورة</button>
+    </div>
+
+    <div x-show="showInvoiceModal" x-transition x-cloak class="fixed inset-0 z-[300] bg-black/80 flex flex-col items-center justify-center p-4 backdrop-blur-md">
+        <div class="theme-card w-full max-w-md rounded-2xl overflow-hidden shadow-2xl relative border border-[var(--border-color)] flex flex-col max-h-[85vh]">
+            <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="watermark">
+            <div class="p-5 border-b border-[var(--border-color)] flex justify-between items-center relative z-10 glass-nav">
+                <h2 class="font-black text-xl text-brand-gold">فاتورة الطلب</h2>
+                <button @click="showInvoiceModal = false" class="text-[var(--white-gold)] opacity-70 text-2xl">✕</button>
+            </div>
+            <div class="p-5 overflow-y-auto relative z-10 flex-1">
+                <template x-for="item in likedItemsList" :key="item.id">
+                    <div class="flex justify-between items-center border-b border-[var(--border-color)] border-dashed py-3 last:border-0">
+                        <div class="flex-1 pr-2">
+                            <h4 class="font-black text-sm text-[var(--text-main)]" x-text="item.name"></h4>
+                            <span class="text-[10px] text-brand-gold opacity-80 mt-1 font-bold" x-text="'الكمية: ' + (quantities[item.id] || 1)"></span>
+                        </div>
+                        <div class="font-black text-[var(--white-gold)] text-sm" x-text="((parseFloat(item.price)||0) * (quantities[item.id] || 1)) + ' SR'"></div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
     <div class="fixed bottom-0 w-full glass-nav px-4 py-3 z-[150]">
         <div class="flex justify-between items-center max-w-md mx-auto">
-            <button @click="view = 'home'" :class="view === 'home' ? 'text-brand-gold' : 'text-brand-gold opacity-50'" class="flex flex-col items-center gap-1 w-1/2">
+            <button @click="view = 'home'" :class="view === 'home' ? 'text-brand-gold' : 'text-brand-gold opacity-50'" class="flex flex-col items-center gap-1 w-1/3">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3l9 7.5v10.5h-6v-6h-6v6h-6v-10.5z"/></svg>
                 <span class="text-[10px] font-black">الرئيسية</span>
             </button>
-            <button @click="view = 'menu'" :class="view === 'menu' ? 'text-brand-gold' : 'text-brand-gold opacity-50'" class="flex flex-col items-center gap-1 w-1/2">
+            <button @click="view = 'menu'" :class="view === 'menu' ? 'text-brand-gold' : 'text-brand-gold opacity-50'" class="flex flex-col items-center gap-1 w-1/3">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 <span class="text-[10px] font-black">المنيو</span>
+            </button>
+            <button @click="view = 'likes'" :class="view === 'likes' ? 'text-brand-gold' : 'text-brand-gold opacity-50'" class="flex flex-col items-center gap-1 relative w-1/3">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span x-show="likes.length > 0" class="absolute -top-1 right-1/2 translate-x-4 bg-red-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center" x-text="likes.length"></span>
+                <span class="text-[10px] font-black" x-text="t('nav_likes')"></span>
             </button>
         </div>
     </div>
@@ -213,16 +313,50 @@
         function taksimApp() {
             return {
                 isLoading: true, view: 'home', currentLang: 'ar', 
-                showSearchModal: false, showQRModal: false, searchQuery: '', showCatBar: true, lastScroll: 0,
-                allRawData: [], activeMenuItems: [], heroOffers: [], categoryBgs: {},
-                langNames: { ar: 'ar العربية', en: 'en English', tr: 'tr Türkçe' },
+                showSearchModal: false, showQRModal: false, showInvoiceModal: false, searchQuery: '',        
+                showCatBar: true, lastScroll: 0,
+                allRawData: [], activeMenuItems: [], heroOffers: [], categoryBgs: {}, likes: [], quantities: {},
+                targetHeroIds: ['TP-116', 'TP-185', 'TP-186', 'TP-003', 'TP-004'],
+
+                langNames: { 
+                    ar: 'ar العربية', en: 'en English', tr: 'tr Türkçe', es: 'es Español', ru: 'ru Русский', 
+                    ur: 'ur اردو', hi: 'hi हिन्दी', fr: 'fr Français', de: 'de Deutsch', zh: 'zh 中文', 
+                    ja: 'ja 日本語', ko: 'ko 한국어', it: 'it Italiano', vi: 'vi Tiếng Việt', th: 'th ไทย', id: 'id Indonesia' 
+                },
                 langLinks: {
                     ar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2026156602&single=true&output=csv',
-                    en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv'
+                    en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv',
+                    tr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=932024028&single=true&output=csv',
+                    es: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2126154876&single=true&output=csv',
+                    ru: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1383179966&single=true&output=csv',
+                    ur: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1356221249&single=true&output=csv',
+                    hi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1947060246&single=true&output=csv',
+                    fr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1967929524&single=true&output=csv',
+                    de: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=330421505&single=true&output=csv',
+                    zh: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=597359201&single=true&output=csv',
+                    ja: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1140262731&single=true&output=csv',
+                    ko: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=961009172&single=true&output=csv',
+                    it: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1885756520&single=true&output=csv',
+                    vi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=37768217&single=true&output=csv',
+                    th: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=369450170&single=true&output=csv',
+                    id: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1467238039&single=true&output=csv'
                 },
-                get isRTL() { return this.currentLang === 'ar'; },
-                t(key) { return key; },
-                handleScroll() { this.showCatBar = window.pageYOffset <= this.lastScroll; this.lastScroll = window.pageYOffset; },
+
+                get isRTL() { return ['ar', 'ur'].includes(this.currentLang); },
+                t(key) { 
+                    const dicts = {
+                        ar: { nav_menu: "قائمة الطعام", nav_likes: "طلباتي", search_placeholder: "ابحث عن طبق...", empty_likes: "سلتك فارغة" },
+                        en: { nav_menu: "Food Menu", nav_likes: "My Order", search_placeholder: "Search...", empty_likes: "Empty Basket" }
+                    };
+                    return dicts[this.currentLang]?.[key] || dicts['ar'][key];
+                },
+
+                handleScroll() {
+                    const y = window.pageYOffset;
+                    this.showCatBar = y <= this.lastScroll || y < 100;
+                    this.lastScroll = y;
+                },
+
                 async changeLanguage() {
                     this.isLoading = true;
                     try {
@@ -232,30 +366,77 @@
                             header: false, skipEmptyLines: true,
                             complete: (results) => {
                                 const rows = results.data.slice(1);
+                                this.categoryBgs = {};
                                 this.allRawData = rows.map(cols => {
                                     let id = (cols[0] || '').trim();
                                     let cat = (cols[1] || '').trim();
-                                    if(parseInt(id.replace('TP-','')) >= 250 && parseInt(id.replace('TP-','')) <= 400) this.categoryBgs[cat] = (cols[6] || '').trim();
+                                    let numId = parseInt(id.replace('TP-', ''));
+                                    if(numId >= 250 && numId <= 400 && cat) this.categoryBgs[cat] = (cols[6] || '').trim();
                                     return {
                                         id: id, category: cat, name: (cols[2] || '').trim(),
                                         price: (cols[3] || '').trim(), description: (cols[5] || '').trim(),
                                         image: (cols[6] || '').trim(),
-                                        available: (cols[9] || '').trim() // توفر الواجهة البحرية (العمود العاشر)
+                                        available: cols.length > 9 ? (cols[9] || '').trim() : '' // توفر الواجهة البحرية
                                     }
                                 }).filter(i => i.id.startsWith('TP-'));
-                                this.activeMenuItems = this.allRawData.filter(i => i.available !== 'غير متوفر' && (parseInt(i.id.replace('TP-','')) < 250 || parseInt(i.id.replace('TP-','')) > 400));
-                                this.heroOffers = this.activeMenuItems.slice(0, 5);
-                                this.isLoading = false;
+                                this.updateBranchData();
                             }
                         });
                     } catch (e) { this.isLoading = false; }
                 },
+
+                updateBranchData() {
+                    this.activeMenuItems = this.allRawData.filter(i => i.available !== 'غير متوفر' && (parseInt(i.id.replace('TP-','')) < 250 || parseInt(i.id.replace('TP-','')) > 400));
+                    this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
+                    this.isLoading = false;
+                },
+
+                get searchResults() {
+                    const q = this.searchQuery.toLowerCase();
+                    return q ? this.activeMenuItems.filter(i => i.name.toLowerCase().includes(q)) : [];
+                },
+
                 get normalCategories() { return [...new Set(this.activeMenuItems.map(i => i.category))].filter(c => c); },
                 getCatItems(cat) { return this.activeMenuItems.filter(i => i.category === cat); },
                 getCategoryBg(cat) { return this.categoryBgs[cat] || ''; },
+                getEnglishCat(cat) { return "TAKSIM SPECIAL"; },
                 getCatEmoji(cat) { return '🍽️'; },
-                scrollToCat(cat) { this.view = 'menu'; const id = 'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, ''); setTimeout(() => { const el = document.getElementById(id); if(el) window.scrollTo({top: el.offsetTop - 120, behavior: 'smooth'}); }, 100); },
-                initApp() { this.changeLanguage(); }
+
+                scrollToCat(cat) {
+                    this.view = 'menu';
+                    const id = 'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '');
+                    setTimeout(() => {
+                        const el = document.getElementById(id);
+                        if(el) window.scrollTo({top: el.offsetTop - 120, behavior: 'smooth'});
+                    }, 100);
+                },
+
+                toggleLike(item) {
+                    if(this.likes.includes(item.id)) {
+                        this.likes = this.likes.filter(id => id !== item.id);
+                        delete this.quantities[item.id];
+                    } else { 
+                        this.likes.push(item.id); 
+                        this.quantities[item.id] = 1; 
+                    }
+                    localStorage.setItem('alshati_likes_v2', JSON.stringify(this.likes));
+                    localStorage.setItem('alshati_qty', JSON.stringify(this.quantities));
+                },
+                isLiked(id) { return this.likes.includes(id); },
+                updateQty(id, d) { 
+                    this.quantities[id] = Math.max(1, (this.quantities[id] || 1) + d); 
+                    localStorage.setItem('alshati_qty', JSON.stringify(this.quantities));
+                },
+                get likedItemsList() { return this.likes.map(id => this.allRawData.find(i => i.id === id)).filter(Boolean); },
+                copyBranchUrl() { navigator.clipboard.writeText(window.location.origin).then(() => alert('تم النسخ!')); },
+
+                initApp() { 
+                    const saved = localStorage.getItem('alshati_likes_v2');
+                    if(saved) this.likes = JSON.parse(saved);
+                    const savedQ = localStorage.getItem('alshati_qty');
+                    if(savedQ) this.quantities = JSON.parse(savedQ);
+                    this.changeLanguage(); 
+                }
             }
         }
     </script>
