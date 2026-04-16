@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Taksim Point | المنيو الرقمي الفاخر</title>
+    <title>Taksim Point | الواجهة البحرية</title>
     
     <link rel="icon" type="image/png" href="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png">
     
@@ -16,11 +16,11 @@
     <style>
         :root { 
             --gold: #D4AF37; 
-            --white-gold: #e8d9b6; /* اللون الذهبي المبيض الصريح */
+            --white-gold: #e8d9b6; 
             --bg-main: #080808; 
             --text-main: #ffffff;
-            --card-bg: rgba(18, 18, 18, 0.8);
-            --section-bg: #0c0c0c;
+            --text-muted: #9ca3af;
+            --card-bg: rgba(18, 18, 18, 0.85);
             --border-color: rgba(232, 217, 182, 0.25); 
             --glass-nav: rgba(10, 10, 10, 0.96);
             --marble-img: url('https://www.transparenttextures.com/patterns/black-mamba.png');
@@ -41,28 +41,15 @@
         [x-cloak] { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* كلاس اللون الموحد والنظيف (بدون تدرجات تعطب الجوال) */
-        .text-brand-gold {
-            color: var(--white-gold) !important;
-        }
-
+        .text-brand-gold { color: var(--white-gold) !important; }
         .pdf-title-ar { font-family: 'Cairo', sans-serif; font-weight: 900; }
         .pdf-title-en { font-family: 'Cinzel Decorative', serif; font-weight: 700; letter-spacing: 2px; }
         
         .glass-nav { background: var(--glass-nav); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
-        
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
         .slide { min-width: 100%; scroll-snap-align: center; }
-        .tiktok-container { height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .tiktok-item { height: 100dvh; scroll-snap-align: start; position: relative; }
-        
         .theme-card { background-color: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.1); transition: all 0.3s; }
-        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; width: 80%; pointer-events: none; z-index: 0; }
-
-        .category-silhouette { filter: brightness(0.6) contrast(1.2) grayscale(0.2); transition: transform 0.4s; object-fit: cover; object-position: center; }
-        .cat-box:hover .category-silhouette { filter: brightness(1) contrast(1.2) grayscale(0); transform: scale(1.1); }
-
-        /* ==== أبعاد الـ PDF ==== */
+        
         .pdf-image {
             position: absolute; inset: 0; width: 100%; height: 100%; 
             object-fit: cover; object-position: right center; 
@@ -71,7 +58,6 @@
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
         }
         
-        /* تظليل صلب جداً خلف النص لحمايته من ألوان الصورة */
         .pdf-overlay { 
             position: absolute; inset: 0; z-index: 10; pointer-events: none; 
             background: linear-gradient(to right, rgba(8,8,8, 0.98) 50%, rgba(8,8,8, 0.8) 70%, transparent 100%); 
@@ -84,205 +70,123 @@
                 -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 25%, black 60%);
             }
         }
-        
-        .drive-iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border: none; z-index: 0;
-        }
     </style>
 </head>
 <body class="overflow-x-hidden relative" :dir="isRTL ? 'rtl' : 'ltr'" x-init="initApp()" @scroll.window="handleScroll()">
 
-    <nav class="fixed top-0 w-full z-[100] glass-nav px-3 py-3 flex flex-wrap justify-between items-center gap-y-2" x-show="view !== 'explore'">
-        <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" alt="Taksim Point" class="h-8 object-contain">
+    <nav class="fixed top-0 w-full z-[100] glass-nav px-3 py-3 flex justify-between items-center" x-show="view !== 'explore'">
+        <div class="flex items-center gap-2">
+            <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" alt="Taksim Point" class="h-8 object-contain">
+            <span class="text-[10px] font-black text-brand-gold bg-white/5 px-2 py-1 rounded border border-[var(--border-color)]">الواجهة البحرية</span>
+        </div>
         
         <div class="flex items-center gap-2">
-            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <button @click="showSearchModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </button>
 
-            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+            <button @click="showQRModal = true" class="p-1 border border-[var(--border-color)] rounded text-brand-gold hover:bg-[var(--white-gold)] hover:text-black transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
             </button>
             
-            <select x-model="currentBranch" @change="updateBranchData()" class="bg-[var(--card-bg)] text-brand-gold border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
-                <option value="alshati" x-text="t('branch_alshati')"></option>
-                <option value="almanar" x-text="t('branch_almanar')"></option>
-                <option value="aljawhara" x-text="t('branch_aljawhara')"></option>
-                <option value="alqunfudhah" x-text="t('branch_alqunfudhah')"></option>
-            </select>
-
-            <select x-model="currentLang" @change="changeLanguage()" class="bg-[var(--card-bg)] text-brand-gold border border-[var(--border-color)] px-1 py-1 text-xs outline-none font-bold rounded shadow-sm">
-                <template x-for="(url, code) in langLinks" :key="code">
-                    <option :value="code" x-text="langNames[code]"></option>
-                </template>
-            </select>
+            <div class="flex items-center bg-[var(--card-bg)] border border-[var(--border-color)] rounded px-1 py-0.5 shadow-sm">
+                <span class="text-xs mr-1">🌍</span>
+                <select x-model="currentLang" @change="changeLanguage()" class="bg-transparent text-brand-gold text-[10px] outline-none font-bold cursor-pointer">
+                    <template x-for="(url, code) in langLinks" :key="code">
+                        <option :value="code" x-text="langNames[code]"></option>
+                    </template>
+                </select>
+            </div>
         </div>
     </nav>
 
     <div x-show="showSearchModal" x-transition.opacity x-cloak class="fixed inset-0 z-[250] bg-[var(--bg-main)] flex flex-col" style="background-image: var(--marble-img);">
         <div class="flex items-center gap-3 p-4 glass-nav">
             <button @click="showSearchModal = false; searchQuery = ''" class="text-brand-gold p-2 rounded-full transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <input type="text" x-model="searchQuery" :placeholder="t('search_placeholder')" class="flex-1 theme-card rounded-lg px-4 py-2.5 text-[var(--text-main)] text-sm outline-none focus:border-[var(--white-gold)] font-bold">
         </div>
-        
         <div class="flex-1 overflow-y-auto p-5 pb-32">
             <div x-show="searchQuery.trim() === ''" x-transition>
-                <h3 class="text-brand-gold text-xs font-black mb-5 uppercase tracking-widest" x-text="t('browse_folders')"></h3>
                 <div class="grid grid-cols-3 gap-3">
                     <template x-for="cat in normalCategories" :key="cat">
                         <button @click="showSearchModal = false; scrollToCat(cat)" class="theme-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition">
-                            <span class="text-3xl drop-shadow" x-text="getCatEmoji(cat)"></span>
+                            <span class="text-3xl" x-text="getCatEmoji(cat)"></span>
                             <span class="text-[10px] font-bold text-center leading-tight text-brand-gold" x-text="cat"></span>
                         </button>
                     </template>
                 </div>
             </div>
-
-            <div x-show="searchQuery.trim() !== ''" x-transition>
-                <h3 class="text-brand-gold text-xs font-black mb-5 uppercase tracking-widest" x-text="t('search_results')"></h3>
-                <div class="flex flex-col gap-3">
-                    <template x-for="item in searchResults" :key="item.id">
-                        <div class="theme-card rounded-xl p-3 flex gap-3 items-center">
-                            <img :src="item.image" class="w-16 h-16 rounded-lg object-cover">
-                            <div class="flex-1">
-                                <h4 class="text-sm font-bold line-clamp-1 text-brand-gold" x-text="item.name"></h4>
-                                <p class="text-[10px] text-brand-gold mb-1 font-bold opacity-80" x-text="item.category"></p>
-                                <span class="font-black text-xs text-brand-gold" x-text="item.price + ' SR'"></span>
-                            </div>
-                            <button @click="toggleLike(item)" class="p-3 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition">
-                                <span x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
-                            </button>
-                        </div>
-                    </template>
-                    <div x-show="searchResults.length === 0" class="text-center text-brand-gold text-sm mt-10 font-bold opacity-50" x-text="t('no_results')"></div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <div x-show="showQRModal" x-cloak class="fixed inset-0 z-[200] bg-black/90 flex flex-col items-center justify-center p-6 backdrop-blur-md">
-        <button @click="showQRModal = false" class="absolute top-6 right-6 text-white text-3xl font-black">✕</button>
-        <div class="theme-card border-[var(--border-color)] p-8 rounded-2xl flex flex-col items-center shadow-[0_0_40px_rgba(232,217,182,0.1)]">
-            <h2 class="font-black text-xl mb-1 text-center text-brand-gold" x-text="t('branch_' + currentBranch)"></h2>
-            <p class="text-brand-gold opacity-70 text-xs mb-6 text-center font-bold">قم بمسح الباركود للوصول السريع</p>
-            <div class="bg-white p-3 rounded-xl mb-6">
-                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(getBranchUrl())" class="w-48 h-48">
-            </div>
-            <button @click="copyBranchUrl()" class="w-full bg-[var(--white-gold)] text-black font-black py-3 rounded-lg flex items-center justify-center gap-2 transition active:scale-95">
-                <span>🔗</span> نسخ رابط الفرع
-            </button>
-        </div>
-    </div>
-
-    <div x-show="isLoading" class="fixed inset-0 z-[200] bg-[var(--bg-main)] flex flex-col items-center justify-center" style="background-image: var(--marble-img);">
-        <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mb-6 animate-pulse drop-shadow-[0_0_15px_rgba(232,217,182,0.3)]">
-        <div class="text-brand-gold text-sm font-black tracking-widest uppercase">Taksim Point...</div>
-    </div>
-
-    <div x-show="hasError" x-cloak class="fixed inset-0 z-[300] bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
-        <span class="text-red-500 text-5xl mb-4">⚠️</span>
-        <h2 class="text-xl font-bold text-[var(--text-main)] mb-2">عذراً، حدث خطأ في جلب القائمة</h2>
-        <button @click="window.location.reload()" class="bg-[var(--white-gold)] text-black px-6 py-2 rounded-full font-bold mt-4">تحديث الصفحة</button>
-    </div>
-
-    <div x-show="view === 'home' && !isLoading && !hasError" x-transition.opacity.duration.500ms class="pb-32 pt-24">
+    <div x-show="view === 'home' && !isLoading" class="pb-32 pt-24">
         <section class="px-6 mb-12 text-center">
-            <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mx-auto mb-6 object-contain drop-shadow-2xl">
-            <h1 class="text-2xl font-black mb-4 text-center text-brand-gold" x-text="t('about_title')"></h1>
-            <p class="text-sm text-brand-gold opacity-90 leading-relaxed text-justify px-2 mb-4 font-semibold" x-text="t('about_p1')"></p>
-            <p class="text-sm text-brand-gold opacity-90 leading-relaxed text-justify px-2 font-semibold" x-text="t('about_p2')"></p>
+            <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="h-20 mx-auto mb-6 object-contain">
+            <h1 class="text-2xl font-black mb-4 text-center text-brand-gold">تقسيم بوينت | الواجهة البحرية</h1>
+            <p class="text-sm text-brand-gold opacity-90 leading-relaxed text-justify px-2 mb-4 font-semibold">استمتع بألذ المأكولات التركية العالمية على إطلالة الواجهة البحرية الساحرة بجدة.</p>
         </section>
 
         <section class="relative h-[35vh] w-full mb-12 px-4">
-            <div class="slider-container h-full no-scrollbar rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)]" id="hero-slider">
+            <div class="slider-container h-full no-scrollbar rounded-xl shadow-2xl" id="hero-slider">
                 <template x-for="(item, index) in heroOffers" :key="item.id">
                     <div class="slide relative h-full theme-card rounded-xl overflow-hidden" :id="'hero-slide-' + index">
-                        <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-5">
-                            <h2 class="text-2xl font-black mb-1 drop-shadow-lg text-brand-gold" x-text="item.name"></h2>
-                            <p class="text-brand-gold opacity-80 text-xs line-clamp-2 mb-3 font-bold" x-text="item.description"></p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xl font-black text-brand-gold drop-shadow" x-text="item.price + ' SR'"></span>
-                                <button @click="scrollToCat(item.category)" class="bg-[var(--white-gold)] text-black px-4 py-1.5 text-xs font-black rounded shadow-lg">الطلب ➔</button>
-                            </div>
+                        <img :src="item.image" loading="lazy" class="w-full h-full object-cover opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-5">
+                            <h2 class="text-xl font-black mb-1 text-brand-gold" x-text="item.name"></h2>
+                            <button @click="scrollToCat(item.category)" class="bg-[var(--white-gold)] text-black px-4 py-1.5 text-[10px] font-black rounded w-max">اطلب الآن</button>
                         </div>
                     </div>
                 </template>
             </div>
         </section>
 
+        <section class="px-6 mb-10">
+            <h3 class="text-lg font-black mb-4 text-center text-brand-gold">موقعنا على الخريطة</h3>
+            <div class="overflow-hidden rounded-2xl shadow-xl border border-[var(--border-color)]">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d237390.7503461374!2d39.41345214843751!3d21.615940981653758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15c3db004673f109%3A0xa40a38ea0b786d88!2z2YXYt9i52YUg2KrZgtiz2YrZhSDYqNmI2YrZhtiqIHwgVGFrc2ltcG9pbnQgcmVzdGF1cmFudHM!5e0!3m2!1sar!2ssa!4v1776364267628!5m2!1sar!2ssa" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </section>
+
         <section class="px-5 mb-10">
-            <h3 class="text-lg font-black mb-6 text-center uppercase tracking-widest text-brand-gold" x-text="t('nav_menu')"></h3>
             <div class="grid grid-cols-2 gap-3">
                 <template x-for="cat in normalCategories" :key="cat">
-                    <button @click="scrollToCat(cat)" class="cat-box theme-card relative h-28 rounded-xl overflow-hidden flex items-center justify-center group border border-[var(--border-color)]">
-                        <img :src="getCategoryBg(cat)" loading="lazy" class="absolute inset-0 w-full h-full category-silhouette">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20"></div>
-                        <span class="relative z-10 font-black text-sm text-center px-1 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-brand-gold" x-text="cat"></span>
+                    <button @click="scrollToCat(cat)" class="cat-box theme-card relative h-28 rounded-xl overflow-hidden flex items-center justify-center border border-[var(--border-color)]">
+                        <img :src="getCategoryBg(cat)" class="absolute inset-0 w-full h-full opacity-60 object-cover">
+                        <div class="absolute inset-0 bg-black/40"></div>
+                        <span class="relative z-10 font-black text-sm text-center px-1 text-brand-gold" x-text="cat"></span>
                     </button>
                 </template>
             </div>
         </section>
     </div>
 
-    <div x-show="view === 'menu' && !hasError" x-cloak class="min-h-screen pt-20 pb-32">
-        
-        <div class="fixed top-[65px] left-0 w-full z-40 transition-transform duration-300" :class="showCatBar ? 'translate-y-0' : '-translate-y-full'">
-            <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 py-2 glass-nav border-b border-[var(--border-color)] shadow-md">
+    <div x-show="view === 'menu'" class="min-h-screen pt-20 pb-32" x-cloak>
+        <div class="fixed top-[65px] left-0 w-full z-40">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 py-2 glass-nav border-b border-[var(--border-color)]">
                 <template x-for="cat in normalCategories" :key="cat">
-                    <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-brand-gold opacity-70 hover:opacity-100 transition" x-text="cat"></button>
+                    <button @click="scrollToCat(cat)" class="px-4 py-2 text-xs font-black whitespace-nowrap text-brand-gold opacity-70" x-text="cat"></button>
                 </template>
             </div>
         </div>
 
         <div class="px-4 mt-12">
             <template x-for="cat in normalCategories" :key="cat">
-                <div class="mb-16 relative rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.5)] border border-[var(--border-color)] scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
-                    
+                <div class="mb-16 relative rounded-xl overflow-hidden shadow-2xl border border-[var(--border-color)] scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
                     <img :src="getCategoryBg(cat)" loading="lazy" class="pdf-image">
-                    
                     <div class="pdf-overlay"></div>
-                    
-                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
-                        
-                        <div class="mb-8 border-r-4 border-[var(--white-gold)] pr-4 drop-shadow-[0_2px_15px_rgba(0,0,0,1)]">
-                            <h2 class="text-3xl md:text-5xl pdf-title-ar mb-1 text-brand-gold" x-text="cat"></h2>
-                            <h3 class="text-xs md:text-sm pdf-title-en text-brand-gold opacity-70 uppercase tracking-widest" x-text="getEnglishCat(cat)"></h3>
-                        </div>
-                        
-                        <div x-show="isIntro(cat) && getCatItems(cat).length === 0" class="drop-shadow-md">
-                            <p class="text-xs md:text-sm leading-loose mb-4 font-bold text-brand-gold" x-text="t('about_p1')"></p>
-                            <p class="text-xs md:text-sm leading-loose font-bold text-brand-gold" x-text="t('about_p2')"></p>
-                        </div>
-
-                        <div class="flex flex-col gap-6 pb-20">
+                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col" dir="rtl">
+                        <h2 class="text-3xl md:text-5xl pdf-title-ar mb-8 text-brand-gold border-r-4 border-[var(--white-gold)] pr-4" x-text="cat"></h2>
+                        <div class="flex flex-col gap-6">
                             <template x-for="item in getCatItems(cat)" :key="item.id">
-                                <div class="flex flex-col relative group theme-card rounded-lg p-3 border border-[var(--border-color)]/50 backdrop-blur-sm">
-                                    
+                                <div class="flex flex-col theme-card rounded-lg p-3 border border-[var(--border-color)]/50 backdrop-blur-sm">
                                     <div class="flex items-end w-full mb-1.5 gap-1">
-                                        <h4 class="font-bold text-sm md:text-base leading-tight whitespace-normal max-w-[70%] text-brand-gold" x-text="item.name"></h4>
-                                        <div class="flex-1 border-b-2 border-dotted border-[var(--white-gold)]/40 relative top-[-4px] min-w-[10px]"></div>
-                                        <span class="text-brand-gold font-black text-sm md:text-base whitespace-nowrap" x-text="item.price + ' SR'"></span>
+                                        <h4 class="font-bold text-sm text-brand-gold" x-text="item.name"></h4>
+                                        <div class="flex-1 border-b-2 border-dotted border-[var(--white-gold)]/40 relative top-[-4px]"></div>
+                                        <span class="text-brand-gold font-black text-sm" x-text="item.price + ' SR'"></span>
                                     </div>
-                                    
-                                    <div class="flex justify-between items-start gap-2">
-                                        <p class="text-[11px] md:text-xs text-brand-gold opacity-80 leading-relaxed font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
-                                        
-                                        <div class="flex items-center gap-2">
-                                            <button @click="toggleLike(item)" class="p-1 glass-nav rounded-full border border-[var(--border-color)] active:scale-90 transition shadow-lg">
-                                                <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-[10px]"></span>
-                                            </button>
-                                            <div x-show="isLiked(item.id)" class="flex items-center gap-2 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-1.5 py-0.5 shadow-lg" x-transition>
-                                                <button @click="updateQty(item.id, -1)" class="text-[var(--white-gold)] text-sm font-black px-1 hover:scale-110">-</button>
-                                                <span class="text-[10px] font-black text-brand-gold w-3 text-center" x-text="quantities[item.id] || 1"></span>
-                                                <button @click="updateQty(item.id, 1)" class="text-[var(--white-gold)] text-sm font-black px-1 hover:scale-110">+</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
+                                    <p class="text-[11px] text-brand-gold opacity-80 font-bold" x-text="item.description"></p>
                                 </div>
                             </template>
                         </div>
@@ -292,134 +196,15 @@
         </div>
     </div>
 
-    <div x-show="view === 'explore' && !hasError" x-cloak class="tiktok-container relative bg-black">
-        <template x-for="item in activeExploreItems" :key="item.id">
-            <div class="tiktok-item" :id="'explore-' + item.id">
-                
-                <template x-if="item.isSocial">
-                    <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] z-50">
-                        <img :src="item.image" class="h-28 mb-8 drop-shadow-[0_0_20px_rgba(232,217,182,0.2)]">
-                        <h2 class="text-3xl font-black mb-4 text-center text-brand-gold" x-text="item.name"></h2>
-                        <p class="text-brand-gold opacity-90 text-center mb-10 text-sm leading-relaxed font-bold" x-text="item.description"></p>
-                        <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
-                            <a href="https://www.tiktok.com/@taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">🎵</span><span class="text-xs font-bold text-[var(--white-gold)]">TikTok</span></a>
-                            <a href="https://www.instagram.com/taksim_point" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">📸</span><span class="text-xs font-bold text-[var(--white-gold)]">Instagram</span></a>
-                            <a href="https://www.youtube.com/channel/UCa6QUKNGNa4FKSOxhSeyxiQ" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">▶️</span><span class="text-xs font-bold text-[var(--white-gold)]">YouTube</span></a>
-                            <a href="https://taksimpoint.sa/locations/" target="_blank" class="bg-[#111] border border-white/10 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-[var(--white-gold)] transition"><span class="text-2xl">📍</span><span class="text-xs font-bold text-[var(--white-gold)]">Locations</span></a>
-                        </div>
-                    </div>
-                </template>
-
-                <template x-if="!item.isSocial">
-                    <div class="w-full h-full relative">
-                        <template x-if="item.isDrive">
-                            <iframe :src="item.image" class="drive-iframe" allow="autoplay; fullscreen"></iframe>
-                        </template>
-                        <template x-if="item.isVideo && !item.isDrive">
-                            <video :src="item.image" autoplay loop muted playsinline preload="metadata" class="w-full h-full object-cover object-center"></video>
-                        </template>
-                        <template x-if="!item.isVideo && !item.isDrive">
-                            <img :src="item.image" loading="lazy" class="w-full h-full object-cover object-center opacity-90">
-                        </template>
-                        
-                        <div x-show="!item.isDrive" class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-6 pb-32 pointer-events-none">
-                            <span class="bg-red-600/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2 uppercase" x-text="t('nav_explore')"></span>
-                            <h2 class="text-3xl font-black mb-2 drop-shadow-xl text-brand-gold" x-text="item.name"></h2>
-                            <p class="text-brand-gold opacity-90 text-sm mb-4 max-w-[80%] drop-shadow-md line-clamp-3 font-bold" x-text="item.description"></p>
-                            <template x-if="item.price"><span class="text-2xl font-black text-[var(--white-gold)] drop-shadow-lg" x-text="item.price + ' SR'"></span></template>
-                            
-                            <div class="absolute right-4 bottom-32 flex flex-col gap-6 items-center pointer-events-auto">
-                                <template x-if="!item.custom">
-                                    <button @click="toggleLike(item)" class="bg-black/50 backdrop-blur p-4 rounded-full border border-white/20 active:scale-75 transition">
-                                        <span class="text-3xl" x-text="isLiked(item.id) ? '❤️' : '🤍'"></span>
-                                    </button>
-                                </template>
-                                <button @click="shareExplore(item.id)" class="bg-black/50 backdrop-blur p-3 rounded-full border border-white/20 active:scale-75 transition">
-                                    <span class="text-lg">🔗</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </template>
-    </div>
-
-    <div x-show="view === 'likes'" x-transition x-cloak class="min-h-screen pt-20 pb-32 px-4">
-        <h2 class="text-2xl font-black text-center mb-8 uppercase text-brand-gold" x-text="t('nav_likes')"></h2>
-        <div x-show="likes.length === 0" class="text-center mt-20 text-[var(--white-gold)] opacity-70 font-black" x-text="t('empty_likes')"></div>
-
-        <div class="flex flex-col gap-4 mb-10">
-            <template x-for="item in likedItemsList" :key="item.id">
-                <div class="theme-card p-3 flex flex-col gap-3 rounded-xl border border-[var(--border-color)] shadow-sm">
-                    <div class="flex justify-between items-center">
-                        <div class="flex-1 px-2">
-                            <h4 class="font-black text-sm text-brand-gold" x-text="item.name"></h4>
-                            <span class="text-[var(--white-gold)] text-xs font-black" x-text="item.price + ' SR'"></span>
-                        </div>
-                        <button @click="toggleLike(item)" class="text-red-500 bg-red-500/10 px-3 py-2 rounded text-xs font-bold border border-red-500/20 active:scale-95 transition">حذف</button>
-                    </div>
-                    <div class="flex justify-between items-center px-2 pt-2 border-t border-[var(--border-color)]">
-                        <span class="text-xs text-brand-gold opacity-90 font-black">الكمية:</span>
-                        <div class="flex items-center gap-4 bg-[var(--section-bg)] border border-[var(--border-color)] rounded-lg px-3 py-1">
-                            <button @click="updateQty(item.id, -1)" class="text-lg font-black text-[var(--white-gold)] hover:scale-110 transition">-</button>
-                            <span class="font-black text-sm w-4 text-center text-[var(--text-main)]" x-text="quantities[item.id] || 1"></span>
-                            <button @click="updateQty(item.id, 1)" class="text-lg font-black text-[var(--white-gold)] hover:scale-110 transition">+</button>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </div>
-
-        <button x-show="likes.length > 0" @click="showInvoiceModal = true" class="w-full bg-[var(--white-gold)] text-black font-black py-4 rounded-xl text-lg shadow-[0_0_20px_rgba(232,217,182,0.2)] active:scale-95 transition tracking-wider" x-text="t('show_invoice')"></button>
-    </div>
-
-    <div x-show="showInvoiceModal" x-transition x-cloak class="fixed inset-0 z-[300] bg-black/80 flex flex-col items-center justify-center p-4 backdrop-blur-md">
-        <div class="theme-card w-full max-w-md rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(232,217,182,0.1)] relative border border-[var(--border-color)] flex flex-col max-h-[85vh]">
-            <img src="https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png" class="watermark">
-            <div class="p-5 border-b border-[var(--border-color)] flex justify-between items-center relative z-10 glass-nav">
-                <h2 class="font-black text-xl text-brand-gold" x-text="t('invoice_title')"></h2>
-                <button @click="showInvoiceModal = false" class="text-[var(--white-gold)] opacity-70 text-2xl hover:text-red-500 transition">✕</button>
-            </div>
-            <div class="p-5 overflow-y-auto relative z-10 flex-1">
-                <template x-for="item in likedItemsList" :key="item.id">
-                    <div class="flex justify-between items-center border-b border-[var(--border-color)] border-dashed py-3 last:border-0">
-                        <div class="flex-1 pr-2">
-                            <h4 class="font-black text-sm text-[var(--text-main)]" x-text="item.name"></h4>
-                            <div class="flex gap-2 text-[10px] text-brand-gold opacity-80 mt-1 font-bold">
-                                <span x-text="'الكمية: ' + (quantities[item.id] || 1)"></span>
-                                <span x-show="item.calories">|</span>
-                                <span x-show="item.calories" x-text="item.calories + ' Kcal'"></span>
-                            </div>
-                        </div>
-                        <div class="font-black text-[var(--white-gold)] text-sm" x-text="((parseFloat(item.price)||0) * (quantities[item.id] || 1)) + ' SR'"></div>
-                    </div>
-                </template>
-            </div>
-            <div class="p-4 bg-[var(--section-bg)] border-t border-[var(--border-color)] relative z-10 text-center">
-                <p class="text-xs font-black text-brand-gold" x-text="t('waiter_note')"></p>
-            </div>
-        </div>
-    </div>
-
     <div class="fixed bottom-0 w-full glass-nav px-4 py-3 z-[150]">
         <div class="flex justify-between items-center max-w-md mx-auto">
-            <button @click="view = 'home'" :class="view === 'home' ? 'text-[var(--white-gold)]' : 'text-[var(--white-gold)] opacity-50'" class="flex flex-col items-center gap-1 w-1/4 transition">
+            <button @click="view = 'home'" :class="view === 'home' ? 'text-brand-gold' : 'text-brand-gold opacity-50'" class="flex flex-col items-center gap-1 w-1/2">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3l9 7.5v10.5h-6v-6h-6v6h-6v-10.5z"/></svg>
-                <span class="text-[10px] font-black" x-text="t('nav_home')"></span>
+                <span class="text-[10px] font-black">الرئيسية</span>
             </button>
-            <button @click="view = 'menu'" :class="view === 'menu' ? 'text-[var(--white-gold)]' : 'text-[var(--white-gold)] opacity-50'" class="flex flex-col items-center gap-1 w-1/4 transition">
+            <button @click="view = 'menu'" :class="view === 'menu' ? 'text-brand-gold' : 'text-brand-gold opacity-50'" class="flex flex-col items-center gap-1 w-1/2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                <span class="text-[10px] font-black" x-text="t('nav_menu')"></span>
-            </button>
-            <button @click="view = 'explore'" :class="view === 'explore' ? 'text-[var(--white-gold)]' : 'text-[var(--white-gold)] opacity-50'" class="flex flex-col items-center gap-1 w-1/4 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span class="text-[10px] font-black" x-text="t('nav_explore')"></span>
-            </button>
-            <button @click="view = 'likes'" :class="view === 'likes' ? 'text-[var(--white-gold)]' : 'text-[var(--white-gold)] opacity-50'" class="flex flex-col items-center gap-1 relative w-1/4 transition">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                <span x-show="likes.length > 0" class="absolute -top-1 right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center" x-text="likes.length"></span>
-                <span class="text-[10px] font-black" x-text="t('nav_likes')"></span>
+                <span class="text-[10px] font-black">المنيو</span>
             </button>
         </div>
     </div>
@@ -427,343 +212,50 @@
     <script>
         function taksimApp() {
             return {
-                isLoading: true, hasError: false, view: 'home', currentLang: 'ar', currentBranch: 'alshati',
-                
-                showQRModal: false, showSearchModal: false, showInvoiceModal: false, searchQuery: '',        
-                showCatBar: true, lastScroll: 0,
-                
-                allRawData: [], activeMenuItems: [], activeExploreItems: [], heroOffers: [], heroIdx: 0, heroInterval: null, syncInterval: null,
-                
-                globalImages: {}, categoryBgs: {}, emptyBgCategories: [], likes: [], quantities: {}, 
-                targetHeroIds: ['TP-116', 'TP-185', 'TP-186', 'TP-003', 'TP-004', 'TP-174', 'TP-175'],
-
-                uiDict: {
-                    ar: {
-                        about_title: "من تقسيم بوينت،،،،",
-                        about_p1: "يعد مطعم تقسيم بوينت من أجود المطاعم التي تقدم أفضل جودة للمأكولات والمشويات التركية والعالمية والتي تتناسب مع جميع افراد المجتمع ويتميز بالسعر المناسب والطعم اللذيذ. تتميز لحومنا بأنها طازجة 100٪ وتخضع لعناية خاصة.",
-                        about_p2: "نطمح أن نصبح من أهم المطاعم في المملكة، ولذلك نمتلك طاقماً مميزاً في جميع الأقسام لتقديم أفضل خدمة وأعلى جودة لجميع عملائنا.",
-                        nav_home: "الرئيسية", nav_menu: "الأصناف", nav_explore: "استكشاف", nav_likes: "طلباتي",
-                        branch_alshati: "الواجهة", branch_almanar: "المنار", branch_aljawhara: "الجوهرة", branch_alqunfudhah: "القنفذة",
-                        show_invoice: "🧾 إظهار كفاتورة", invoice_title: "فاتورة الطلب", waiter_note: "يرجى عرض هذه القائمة للنادل لخدمتك ✨",
-                        empty_likes: "سلتك فارغة. اضغط على القلب لإضافة أصناف!",
-                        search_placeholder: "ابحث عن طبق، برجر، عصير...", browse_folders: "تصفح الأقسام", search_results: "نتائج البحث", no_results: "لا توجد نتائج",
-                        vid_mix_grill: "حصرياً في فرعنا بالقنفذة: عرض مكس جريل", vid_best_steak: "أفضل ستيك"
-                    },
-                    en: {
-                        about_title: "From Taksim Point,,,,",
-                        about_p1: "Taksim Point Restaurant is one of the finest restaurants offering the highest quality of Turkish and international cuisine and grills. It is distinguished by its affordable prices. We use 100% fresh meats.",
-                        about_p2: "Our primary mission is to provide the best service to all customers. We have an outstanding team and aspire to become one of the most prominent restaurants globally.",
-                        nav_home: "Home", nav_menu: "Menu", nav_explore: "Explore", nav_likes: "My Order",
-                        branch_alshati: "Waterfront", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara", branch_alqunfudhah: "Al Qunfudhah",
-                        show_invoice: "🧾 Show Receipt", invoice_title: "Order Receipt", waiter_note: "Please show this list to the waiter ✨",
-                        empty_likes: "No items selected.",
-                        search_placeholder: "Search for a dish, burger...", browse_folders: "Categories", search_results: "Results", no_results: "No results found",
-                        vid_mix_grill: "Exclusive at Al Qunfudhah: Mix Grill Offer", vid_best_steak: "BEST STEAK"
-                    },
-                    tr: {
-                        about_title: "Taksim Point'ten,,,,",
-                        about_p1: "Taksim Point, herkes için uygun olan en kaliteli Türk ve uluslararası yemekleri sunan en iyi restoranlardan biridir. %100 taze etleriyle ünlüdür.",
-                        about_p2: "Bu vizyonla en önemli görevimiz müşterilerimize en iyi hizmeti sunmaktır.",
-                        nav_home: "Ana Sayfa", nav_menu: "Menü", nav_explore: "Keşfet", nav_likes: "Siparişlerim",
-                        branch_alshati: "Sahil", branch_almanar: "Al-Manar", branch_aljawhara: "Al-Jawhara", branch_alqunfudhah: "Al Qunfudhah",
-                        show_invoice: "🧾 Fişi Göster", invoice_title: "Sipariş Fişi", waiter_note: "Lütfen bu listeyi garsona gösterin ✨",
-                        empty_likes: "Sipariş bulunamadı.",
-                        search_placeholder: "Yemek, burger ara...", browse_folders: "Kategoriler", search_results: "Sonuçlar", no_results: "Sonuç bulunamadı",
-                        vid_mix_grill: "Sadece Al Qunfudhah'da: Karışık Izgara", vid_best_steak: "EN İYİ BİFTEK"
-                    }
-                },
-
-                langNames: { ar: 'العربية', en: 'English', tr: 'Türkçe', es: 'Español', ru: 'Русский', ur: 'اردو', hi: 'हिन्दी', fr: 'Français', du: 'Deutsch', zn: '中文', ja: '日本語', ko: '한국어', it: 'Italiano', vi: 'Tiếng Việt', th: 'ไทย', id: 'Indonesia' },
+                isLoading: true, view: 'home', currentLang: 'ar', 
+                showSearchModal: false, showQRModal: false, searchQuery: '', showCatBar: true, lastScroll: 0,
+                allRawData: [], activeMenuItems: [], heroOffers: [], categoryBgs: {},
+                langNames: { ar: 'ar العربية', en: 'en English', tr: 'tr Türkçe' },
                 langLinks: {
                     ar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2026156602&single=true&output=csv',
-                    en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv',
-                    tr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=932024028&single=true&output=csv',
-                    es: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=2126154876&single=true&output=csv',
-                    ru: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1383179966&single=true&output=csv',
-                    ur: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1356221249&single=true&output=csv',
-                    hi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1947060246&single=true&output=csv',
-                    fr: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1967929524&single=true&output=csv',
-                    du: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=330421505&single=true&output=csv',
-                    zn: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=597359201&single=true&output=csv',
-                    ja: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1140262731&single=true&output=csv',
-                    ko: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=961009172&single=true&output=csv',
-                    it: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1885756520&single=true&output=csv',
-                    vi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=37768217&single=true&output=csv',
-                    th: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=369450170&single=true&output=csv',
-                    id: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1467238039&single=true&output=csv'
+                    en: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQOkdnVoo1JZxM3ZIw11KaQno61mag50VxycvqZ-kY6OC0oZ3tef1gJJYAnStaLlLsmaLvzIlR6KKRK/pub?gid=1709873212&single=true&output=csv'
                 },
-
-                get isRTL() { return ['ar', 'ur', 'fa', 'he'].includes(this.currentLang); },
-                t(key) { const dict = this.uiDict[this.currentLang] || this.uiDict['en']; return dict[key] || this.uiDict['ar'][key] || key; },
-
-                handleScroll() {
-                    const currentY = window.pageYOffset;
-                    this.showCatBar = currentY <= this.lastScroll || currentY < 100;
-                    this.lastScroll = currentY;
-                },
-
-                initLocalStorage() {
-                    try {
-                        const savedLikes = localStorage.getItem('taksim_likes');
-                        if(savedLikes) this.likes = JSON.parse(savedLikes);
-                        const savedQty = localStorage.getItem('taksim_qty');
-                        if(savedQty) this.quantities = JSON.parse(savedQty);
-                    } catch (e) { 
-                        this.likes = []; this.quantities = {};
-                        localStorage.removeItem('taksim_likes'); localStorage.removeItem('taksim_qty');
-                    }
-                },
-
-                async fetchGlobalImages() {
-                    try {
-                        const res = await fetch(this.langLinks['ar'] + '&t=' + Date.now());
-                        if(!res.ok) return;
-                        const text = await res.text();
-                        Papa.parse(text, {
-                            header: false, skipEmptyLines: true,
-                            complete: (results) => {
-                                results.data.slice(1).forEach(cols => {
-                                    if(cols.length < 7) return;
-                                    let id = (cols[0] || '').trim();
-                                    let img = (cols[6] || '').trim();
-                                    if(id && img) this.globalImages[id] = img;
-                                });
-                            }
-                        });
-                    } catch(e) {}
-                },
-
-                async changeLanguage(isBackgroundSync = false) {
-                    if(!isBackgroundSync) { this.isLoading = true; this.hasError = false; }
+                get isRTL() { return this.currentLang === 'ar'; },
+                t(key) { return key; },
+                handleScroll() { this.showCatBar = window.pageYOffset <= this.lastScroll; this.lastScroll = window.pageYOffset; },
+                async changeLanguage() {
+                    this.isLoading = true;
                     try {
                         const res = await fetch(this.langLinks[this.currentLang] + '&t=' + Date.now());
-                        if (!res.ok) throw new Error('Network Issue');
                         const text = await res.text();
-                        
                         Papa.parse(text, {
                             header: false, skipEmptyLines: true,
                             complete: (results) => {
                                 const rows = results.data.slice(1);
-                                this.categoryBgs = {};
-                                this.emptyBgCategories = [];
-
-                                let parsedData = rows.map(cols => {
-                                    if(cols.length < 2) return null;
+                                this.allRawData = rows.map(cols => {
                                     let id = (cols[0] || '').trim();
                                     let cat = (cols[1] || '').trim();
-                                    let numId = parseInt(id.replace('TP-', ''));
-                                    
-                                    if(numId >= 250 && numId <= 400 && cat) {
-                                        this.categoryBgs[cat] = (cols[6] || '').trim() || this.globalImages[id] || '';
-                                        this.emptyBgCategories.push(cat);
-                                    }
-
+                                    if(parseInt(id.replace('TP-','')) >= 250 && parseInt(id.replace('TP-','')) <= 400) this.categoryBgs[cat] = (cols[6] || '').trim();
                                     return {
                                         id: id, category: cat, name: (cols[2] || '').trim(),
-                                        price: (cols[3] || '').trim(), calories: (cols[4] || '').trim(),
-                                        description: (cols[5] || '').replace(/\r?\n|\r/g, ' ').trim(),
-                                        image: (cols[6] || '').trim() || this.globalImages[id] || '', 
-                                        almanar: cols.length > 7 ? (cols[7] || '').trim() : '', 
-                                        aljawhara: cols.length > 8 ? (cols[8] || '').trim() : '', 
-                                        alshati: cols.length > 9 ? (cols[9] || '').trim() : '',
-                                        alqunfudhah: cols.length > 10 ? (cols[10] || '').trim() : ''
+                                        price: (cols[3] || '').trim(), description: (cols[5] || '').trim(),
+                                        image: (cols[6] || '').trim(),
+                                        available: (cols[9] || '').trim() // توفر الواجهة البحرية (العمود العاشر)
                                     }
-                                }).filter(i => i && i.id && i.id.startsWith('TP-'));
-
-                                if (parsedData.length === 0) throw new Error('No Data');
-                                this.allRawData = parsedData;
-                                this.updateBranchData();
-                            },
-                            error: () => { if(!isBackgroundSync) this.hasError = true; }
-                        });
-                    } catch (e) { if(!isBackgroundSync) this.hasError = true; this.isLoading = false; }
-                },
-
-                updateBranchData() {
-                    let availableItems = this.allRawData.filter(item => {
-                        if (this.currentBranch === 'almanar' && item.almanar === 'غير متوفر') return false;
-                        if (this.currentBranch === 'aljawhara' && item.aljawhara === 'غير متوفر') return false;
-                        if (this.currentBranch === 'alshati' && item.alshati === 'غير متوفر') return false;
-                        if (this.currentBranch === 'alqunfudhah' && item.alqunfudhah === 'غير متوفر') return false;
-                        return true;
-                    });
-
-                    this.activeMenuItems = availableItems.filter(item => {
-                        const numId = parseInt(item.id.replace('TP-', ''));
-                        return (numId < 250 || numId > 400) && !['الاستكشاف', 'Explore', 'Keşfet'].includes(item.category);
-                    });
-
-                    this.heroOffers = this.activeMenuItems.filter(i => this.targetHeroIds.includes(i.id));
-
-                    const vidMixGrillId = '1kFM5-1vGfELfGN35UspAHndg4IJdOtBL';
-                    const vidBestSteakId = '11HoXmfaU1QxLnqsPY0EsPHB66WqZxB55';
-                    
-                    const directVids = [
-                        { id: 'vid-mixgrill', name: this.t('vid_mix_grill'), description: '', price: '', image: `https://drive.google.com/file/d/${vidMixGrillId}/preview`, category: 'استكشاف', isDrive: true, custom: true, exclusiveBranch: 'alqunfudhah' },
-                        { id: 'vid-beststeak', name: this.t('vid_best_steak'), description: '', price: '', image: `https://drive.google.com/file/d/${vidBestSteakId}/preview`, category: 'استكشاف', isDrive: true, custom: true }
-                    ];
-
-                    let dbExploreItems = availableItems.filter(i => ['الاستكشاف', 'Explore', 'Keşfet'].includes(i.category));
-                    const socialCard = { id: 'social-card-1', name: 'تابعونا على المنصات', description: 'كن على إطلاع دائم بآخر العروض.', image: 'https://cdn.phototourl.com/free/2026-04-06-d0b6c388-fcdf-40fd-a7dc-56a84b8309a2.png', isSocial: true, custom: true };
-
-                    this.activeExploreItems = [...directVids, ...dbExploreItems, socialCard].filter(item => {
-                        if (item.exclusiveBranch && item.exclusiveBranch !== this.currentBranch) return false;
-                        return true;
-                    });
-
-                    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?branch=' + this.currentBranch;
-                    window.history.replaceState({path:newUrl}, '', newUrl);
-
-                    this.startAutoScroll();
-                    this.isLoading = false;
-                },
-
-                get searchResults() {
-                    if (this.searchQuery.trim() === '') return [];
-                    const q = this.searchQuery.toLowerCase();
-                    return this.activeMenuItems.filter(i => 
-                        i.name.toLowerCase().includes(q) || 
-                        i.category.toLowerCase().includes(q) || 
-                        i.description.toLowerCase().includes(q)
-                    );
-                },
-
-                startAutoScroll() {
-                    if(this.heroInterval) clearInterval(this.heroInterval);
-                    this.heroInterval = setInterval(() => {
-                        const slider = document.getElementById('hero-slider');
-                        if (slider) {
-                            const slideWidth = slider.clientWidth;
-                            if (slider.scrollLeft + slideWidth >= slider.scrollWidth - 10) {
-                                slider.scrollTo({ left: 0, behavior: 'smooth' }); 
-                            } else {
-                                slider.scrollBy({ left: this.isRTL ? -slideWidth : slideWidth, behavior: 'smooth' });
+                                }).filter(i => i.id.startsWith('TP-'));
+                                this.activeMenuItems = this.allRawData.filter(i => i.available !== 'غير متوفر' && (parseInt(i.id.replace('TP-','')) < 250 || parseInt(i.id.replace('TP-','')) > 400));
+                                this.heroOffers = this.activeMenuItems.slice(0, 5);
+                                this.isLoading = false;
                             }
-                        }
-                    }, 5000);
+                        });
+                    } catch (e) { this.isLoading = false; }
                 },
-
-                startBackgroundSync() {
-                    if(this.syncInterval) clearInterval(this.syncInterval);
-                    this.syncInterval = setInterval(() => { this.changeLanguage(true); }, 60000);
-                },
-
-                get normalCategories() { 
-                    let cats = [...new Set(this.activeMenuItems.map(i => i.category))];
-                    cats = [...new Set([...cats, ...this.emptyBgCategories])].filter(c => c !== '');
-                    
-                    const introKeywords = ['مقدم', 'intro', 'giriş'];
-                    let introCat = cats.find(c => introKeywords.some(k => c.toLowerCase().includes(k)));
-                    if(introCat) {
-                        cats = cats.filter(c => c !== introCat);
-                        cats.unshift(introCat);
-                    }
-                    return cats; 
-                },
-                
+                get normalCategories() { return [...new Set(this.activeMenuItems.map(i => i.category))].filter(c => c); },
                 getCatItems(cat) { return this.activeMenuItems.filter(i => i.category === cat); },
-                isIntro(cat) { return ['مقدم', 'intro', 'giriş'].some(k => cat.toLowerCase().includes(k)); },
-
-                getCatEmoji(cat) {
-                    const c = cat.toLowerCase();
-                    if(c.includes('فطور') || c.includes('break') || c.includes('kahv')) return '🍳';
-                    if(c.includes('مقبلات') || c.includes('appet') || c.includes('meze')) return '🥗';
-                    if(c.includes('شاورما') || c.includes('shawar') || c.includes('döner')) return '🌯';
-                    if(c.includes('برجر') || c.includes('burg')) return '🍔';
-                    if(c.includes('بيتزا') || c.includes('piz')) return '🍕';
-                    if(c.includes('لحم') || c.includes('ستيك') || c.includes('steak') || c.includes('et')) return '🥩';
-                    if(c.includes('حلو') || c.includes('dessert') || c.includes('tatl') || c.includes('sweet')) return '🍰';
-                    if(c.includes('عصير') || c.includes('مشروب') || c.includes('drink') || c.includes('juice')) return '🍹';
-                    if(c.includes('قهو') || c.includes('coff') || c.includes('kahve')) return '☕';
-                    if(c.includes('مقدم') || c.includes('intro') || c.includes('giriş')) return '✨';
-                    if(c.includes('مشوي') || c.includes('grill') || c.includes('ızgara')) return '🍢';
-                    if(c.includes('سلط') || c.includes('salad') || c.includes('salata')) return '🥗';
-                    return '🍽️';
-                },
-
-                getEnglishCat(cat) {
-                    const map = { 'المقدمة': 'Introduction', 'مشويات': 'Grills', 'برجر': 'Burgers', 'بيتزا': 'Pizza', 'مقبلات': 'Appetizers', 'مشروبات': 'Drinks', 'حلويات': 'Desserts' };
-                    return map[cat] || 'Taksim Menu';
-                },
-
-                getCategoryBg(catName) { return this.categoryBgs[catName] || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800'; },
-                getBranchUrl() { return window.location.origin + window.location.pathname + '?branch=' + this.currentBranch; },
-                copyBranchUrl() { navigator.clipboard.writeText(this.getBranchUrl()).then(() => alert('تم نسخ رابط الفرع!')); },
-
-                scrollToCat(cat) {
-                    this.view = 'menu';
-                    this.showSearchModal = false; 
-                    const safeCatId = btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '');
-                    setTimeout(() => {
-                        const el = document.getElementById('cat-' + safeCatId);
-                        if(el) {
-                            const y = el.getBoundingClientRect().top + window.pageYOffset - 120;
-                            window.scrollTo({top: y, behavior: 'smooth'});
-                        }
-                    }, 350); 
-                },
-
-                get likedItemsList() { return this.likes.map(id => this.allRawData.find(i => i.id === id)).filter(Boolean); },
-
-                toggleLike(item) {
-                    const audio = document.getElementById('sfx-pop');
-                    if(audio) { audio.volume = 0.3; audio.currentTime = 0; audio.play().catch(e=>{}); }
-                    
-                    if(this.likes.includes(item.id)) {
-                        this.likes = this.likes.filter(id => id !== item.id);
-                        delete this.quantities[item.id]; 
-                    } else {
-                        this.likes.push(item.id);
-                        this.quantities[item.id] = 1; 
-                    }
-                    this.saveLikesAndQty();
-                },
-
-                updateQty(id, delta) {
-                    if(!this.quantities[id]) this.quantities[id] = 1;
-                    this.quantities[id] += delta;
-                    if(this.quantities[id] < 1) this.quantities[id] = 1;
-                    this.saveLikesAndQty();
-                },
-
-                saveLikesAndQty() {
-                    localStorage.setItem('taksim_likes', JSON.stringify(this.likes));
-                    localStorage.setItem('taksim_qty', JSON.stringify(this.quantities));
-                },
-
-                isLiked(id) { return this.likes.includes(id); },
-
-                shareExplore(id) {
-                    const url = window.location.origin + window.location.pathname + '?view=explore&branch=' + this.currentBranch + '&explore=' + id;
-                    if (navigator.share) navigator.share({ title: 'تقسيم بوينت | استكشف', url: url });
-                    else { navigator.clipboard.writeText(url); alert('تم نسخ الرابط!'); }
-                },
-
-                async initApp() { 
-                    this.initLocalStorage(); 
-                    
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const allowedBranches = ['alshati', 'almanar', 'aljawhara', 'alqunfudhah'];
-                    let b = urlParams.get('branch');
-                    if(b && allowedBranches.includes(b)) this.currentBranch = b; 
-                    
-                    await this.fetchGlobalImages();
-                    await this.changeLanguage(); 
-                    
-                    let sharedView = urlParams.get('view');
-                    const exploreId = urlParams.get('explore');
-                    if(exploreId || sharedView === 'explore') {
-                        this.view = 'explore';
-                        if(exploreId) {
-                            setTimeout(() => {
-                                const el = document.getElementById('explore-' + exploreId);
-                                if(el) el.scrollIntoView({ behavior: 'auto' });
-                            }, 1000);
-                        }
-                    }
-
-                    this.startBackgroundSync();
-                }
+                getCategoryBg(cat) { return this.categoryBgs[cat] || ''; },
+                getCatEmoji(cat) { return '🍽️'; },
+                scrollToCat(cat) { this.view = 'menu'; const id = 'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, ''); setTimeout(() => { const el = document.getElementById(id); if(el) window.scrollTo({top: el.offsetTop - 120, behavior: 'smooth'}); }, 100); },
+                initApp() { this.changeLanguage(); }
             }
         }
     </script>
