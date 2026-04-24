@@ -19,7 +19,6 @@
             --white-gold: #e8d9b6; 
             --bg-main: #080808; 
             --text-main: #ffffff;
-            --text-muted: #9ca3af;
             --card-bg: rgba(18, 18, 18, 0.85);
             --section-bg: #0c0c0c;
             --border-color: rgba(232, 217, 182, 0.25); 
@@ -44,7 +43,6 @@
         
         .text-brand-gold { color: var(--white-gold) !important; }
         .pdf-title-ar { font-family: 'Cairo', sans-serif; font-weight: 900; }
-        .pdf-title-en { font-family: 'Cinzel Decorative', serif; font-weight: 700; letter-spacing: 2px; }
         
         .glass-nav { background: var(--glass-nav); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
@@ -55,13 +53,13 @@
         .pdf-image {
             position: absolute; inset: 0; width: 100%; height: 100%; 
             object-fit: cover; object-position: right center; 
-            z-index: 0; opacity: 0.98;
+            opacity: 0.98;
             mask-image: linear-gradient(to right, transparent 0%, black 20%);
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%);
         }
         
         .pdf-overlay { 
-            position: absolute; inset: 0; z-index: 10; pointer-events: none; 
+            position: absolute; inset: 0; pointer-events: none; 
             background: linear-gradient(to right, rgba(8,8,8, 0.98) 50%, rgba(8,8,8, 0.8) 70%, transparent 100%); 
         }
         
@@ -211,23 +209,44 @@
 
         <div class="px-4 mt-12">
             <template x-for="cat in normalCategories" :key="cat">
-                <div class="mb-16 relative rounded-xl overflow-hidden shadow-2xl border border-[var(--border-color)] scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
-                    <img :src="getCategoryBg(cat)" loading="lazy" class="pdf-image">
-                    <div class="pdf-overlay"></div>
-                    <div class="absolute inset-y-0 left-0 w-[85%] md:w-[50%] z-20 p-5 md:p-10 flex flex-col overflow-y-auto no-scrollbar" dir="rtl">
-                        <div class="mb-8 border-r-4 border-[var(--white-gold)] pr-4">
-                            <h2 class="text-3xl md:text-5xl pdf-title-ar mb-1 text-brand-gold" x-text="cat"></h2>
+                <div class="mb-16 relative rounded-xl overflow-hidden shadow-2xl border scroll-mt-[130px] min-h-[85vh] bg-[var(--bg-main)]" 
+                     :class="(cat.includes('مشوي') || cat.includes('Grill')) ? 'border-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.15)]' : 'border-[var(--border-color)]'"
+                     :id="'cat-' + btoa(unescape(encodeURIComponent(cat))).replace(/=/g, '')">
+                    
+                    <div class="absolute inset-0 z-0">
+                        <div class="sticky top-[60px] w-full h-[100dvh]">
+                            <img :src="getCategoryBg(cat)" loading="lazy" class="pdf-image">
+                            <div class="pdf-overlay"></div>
                         </div>
-                        <div class="flex flex-col gap-6 pb-20">
+                    </div>
+
+                    <div class="relative z-20 p-5 md:p-10 w-[85%] md:w-[50%] flex flex-col" dir="rtl">
+                        
+                        <div class="mb-8 border-r-4 pr-4 relative" :class="(cat.includes('مشوي') || cat.includes('Grill')) ? 'border-[#D4AF37]' : 'border-[var(--white-gold)]'">
+                            <h2 class="text-3xl md:text-5xl pdf-title-ar mb-1" :class="(cat.includes('مشوي') || cat.includes('Grill')) ? 'text-[#D4AF37] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-brand-gold'" x-text="cat"></h2>
+                            <template x-if="cat.includes('مشوي') || cat.includes('Grill')">
+                                <span class="inline-block mt-2 bg-gradient-to-r from-[#D4AF37] to-[#B38728] text-black text-xs font-black px-3 py-1 rounded-full shadow-lg">🔥 القسم الأكثر طلباً</span>
+                            </template>
+                        </div>
+
+                        <div class="flex flex-col gap-6 pb-10">
                             <template x-for="item in getCatItems(cat)" :key="item.id">
-                                <div class="flex flex-col relative theme-card rounded-lg p-3 border border-[var(--border-color)]/50 backdrop-blur-sm">
+                                <div class="flex flex-col relative theme-card rounded-lg p-3 border backdrop-blur-sm"
+                                     :class="(item.name.includes('مكس') || item.name.includes('ميكس') || item.name.includes('جريل') || item.name.includes('Mix')) ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-[0_0_15px_rgba(212,175,55,0.2)]' : 'border-[var(--border-color)]/50'">
+                                    
+                                    <template x-if="item.name.includes('مكس') || item.name.includes('ميكس') || item.name.includes('جريل') || item.name.includes('Mix')">
+                                        <span class="absolute -top-3 left-3 bg-gradient-to-r from-[#D4AF37] to-[#B38728] text-black text-[10px] font-black px-2 py-0.5 rounded shadow-lg">🔥 الأكثر طلباً</span>
+                                    </template>
+
                                     <div class="flex items-end w-full mb-1.5 gap-1">
-                                        <h4 class="font-bold text-sm md:text-base leading-tight text-brand-gold max-w-[70%]" x-text="item.name"></h4>
-                                        <div class="flex-1 border-b-2 border-dotted border-[var(--white-gold)]/40 relative top-[-4px] min-w-[10px]"></div>
-                                        <span class="text-brand-gold font-black text-sm md:text-base whitespace-nowrap" x-text="item.price + ' SR'"></span>
+                                        <h4 class="font-bold text-sm md:text-base leading-tight max-w-[70%]" 
+                                            :class="(item.name.includes('مكس') || item.name.includes('ميكس') || item.name.includes('جريل') || item.name.includes('Mix')) ? 'text-[#D4AF37]' : 'text-brand-gold'" 
+                                            x-text="item.name"></h4>
+                                        <div class="flex-1 border-b-2 border-dotted relative top-[-4px] min-w-[10px]" :class="(item.name.includes('مكس') || item.name.includes('ميكس') || item.name.includes('جريل') || item.name.includes('Mix')) ? 'border-[#D4AF37]/50' : 'border-[var(--white-gold)]/40'"></div>
+                                        <span class="font-black text-sm md:text-base whitespace-nowrap" :class="(item.name.includes('مكس') || item.name.includes('ميكس') || item.name.includes('جريل') || item.name.includes('Mix')) ? 'text-[#D4AF37]' : 'text-brand-gold'" x-text="item.price + ' SR'"></span>
                                     </div>
                                     <div class="flex justify-between items-start gap-2">
-                                        <p class="text-[11px] md:text-xs text-brand-gold opacity-80 font-bold line-clamp-2 flex-1 pr-1" x-text="item.description"></p>
+                                        <p class="text-[11px] md:text-xs opacity-80 font-bold line-clamp-2 flex-1 pr-1" :class="(item.name.includes('مكس') || item.name.includes('ميكس') || item.name.includes('جريل') || item.name.includes('Mix')) ? 'text-[#D4AF37]' : 'text-brand-gold'" x-text="item.description"></p>
                                         <button @click="toggleLike(item)" class="p-1.5 glass-nav rounded-full border border-[var(--border-color)]">
                                             <span x-text="isLiked(item.id) ? '❤️' : '🤍'" class="text-[10px]"></span>
                                         </button>
@@ -399,7 +418,6 @@
                 get normalCategories() { return [...new Set(this.activeMenuItems.map(i => i.category))].filter(c => c); },
                 getCatItems(cat) { return this.activeMenuItems.filter(i => i.category === cat); },
                 getCategoryBg(cat) { return this.categoryBgs[cat] || ''; },
-                getEnglishCat(cat) { return "TAKSIM SPECIAL"; },
                 getCatEmoji(cat) { return '🍽️'; },
 
                 scrollToCat(cat) {
@@ -419,21 +437,21 @@
                         this.likes.push(item.id); 
                         this.quantities[item.id] = 1; 
                     }
-                    localStorage.setItem('alshati_likes_v2', JSON.stringify(this.likes));
-                    localStorage.setItem('alshati_qty', JSON.stringify(this.quantities));
+                    localStorage.setItem('alshati_likes_v3', JSON.stringify(this.likes));
+                    localStorage.setItem('alshati_qty_v3', JSON.stringify(this.quantities));
                 },
                 isLiked(id) { return this.likes.includes(id); },
                 updateQty(id, d) { 
                     this.quantities[id] = Math.max(1, (this.quantities[id] || 1) + d); 
-                    localStorage.setItem('alshati_qty', JSON.stringify(this.quantities));
+                    localStorage.setItem('alshati_qty_v3', JSON.stringify(this.quantities));
                 },
                 get likedItemsList() { return this.likes.map(id => this.allRawData.find(i => i.id === id)).filter(Boolean); },
                 copyBranchUrl() { navigator.clipboard.writeText(window.location.origin).then(() => alert('تم النسخ!')); },
 
                 initApp() { 
-                    const saved = localStorage.getItem('alshati_likes_v2');
+                    const saved = localStorage.getItem('alshati_likes_v3');
                     if(saved) this.likes = JSON.parse(saved);
-                    const savedQ = localStorage.getItem('alshati_qty');
+                    const savedQ = localStorage.getItem('alshati_qty_v3');
                     if(savedQ) this.quantities = JSON.parse(savedQ);
                     this.changeLanguage(); 
                 }
